@@ -13,7 +13,6 @@ var err error
 func Init() {
 	config := config.GetConfig()
 	connectionString := config.DB_USERNAME + ":" + config.DB_PASSWORD + "@tcp(" + config.DB_HOST + ":" + config.DB_PORT + ")/" + config.DB_NAME
-
 	db, err = sql.Open("mysql", connectionString)
 
 	if err != nil {

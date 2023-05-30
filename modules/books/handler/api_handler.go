@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"golang-api/db"
+	"fmt"
 	models "golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	"golang-api/modules/books/usecases"
@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 // HTTPHandler struct
@@ -18,9 +19,7 @@ type HTTPHandler struct {
 }
 
 // New initiation
-func New() *HTTPHandler {
-	db := db.GetConn()
-
+func New(db *gorm.DB) *HTTPHandler {
 	repository := repositories.NewRepositoryImpl(db)
 	usecaseImpl := usecases.NewUsecaseImpl(repository)
 	return &HTTPHandler{
@@ -48,6 +47,7 @@ func (h *HTTPHandler) GetAllBook(c echo.Context) error {
 
 func (h *HTTPHandler) CreateBook(c echo.Context) error {
 	book := new(models.RequestCreateBook)
+	fmt.Println(book)
 	if err := c.Bind(book); err != nil {
 		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}

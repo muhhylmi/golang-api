@@ -37,7 +37,7 @@ func (usecase *UsecaseImpl) CreateBook(ctx context.Context, payload *web.Request
 		Author: payload.Author,
 		Year:   payload.Year,
 	}
-	book, err := usecase.repository.Save(bookData)
+	book, err := usecase.repository.Save(&bookData)
 	if err != nil {
 		error := utils.NewBadRequest()
 		result.Error = error
@@ -67,7 +67,7 @@ func (usecase *UsecaseImpl) UpdateBook(ctx context.Context, payload *web.Request
 		Author: payload.Author,
 		Year:   payload.Year,
 	}
-	book, err := usecase.repository.Update(bookData)
+	book, err := usecase.repository.Update(&bookData)
 	if err != nil {
 		error := utils.NewBadRequest()
 		result.Error = error

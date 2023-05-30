@@ -4,20 +4,20 @@ type (
 	RequestCreateBook struct {
 		Title  string `json:"title"`
 		Author string `json:"author"`
-		Year   int    `json:"year"`
+		Year   int64  `json:"year"`
 	}
 
 	RequestUpdateBook struct {
-		Id     int    `param:"id" json:"id"`
+		Id     uint   `param:"id" json:"id"`
 		Title  string `json:"title"`
 		Author string `json:"author"`
-		Year   int    `json:"year"`
+		Year   int64  `json:"year"`
 	}
 
 	RequestDeleteBook struct {
-		Id int `param:"id" json:"id"`
+		Id uint `param:"id" json:"id"`
 	}
 	RequestDetailBook struct {
-		Id int `param:"id" json:"id"`
+		Id uint `param:"id" json:"id"`
 	}
 )

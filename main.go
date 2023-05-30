@@ -10,14 +10,14 @@ import (
 )
 
 func main() {
-	db.Init()
+	db := db.InitPostgres()
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "This service is running properly")
 	})
 
 	booksGroup := e.Group("/books")
-	books.New().Mount(booksGroup)
+	books.New(db).Mount(booksGroup)
 
 	e.Logger.Fatal(e.Start(":1234"))
 }
