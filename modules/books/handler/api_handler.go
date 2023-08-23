@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	models "golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	"golang-api/modules/books/usecases"
@@ -47,8 +46,7 @@ func (h *HTTPHandler) GetAllBook(c echo.Context) error {
 
 func (h *HTTPHandler) CreateBook(c echo.Context) error {
 	book := new(models.RequestCreateBook)
-	fmt.Println(book)
-	if err := c.Bind(book); err != nil {
+	if err := utils.BindValidate(c, book); err != nil {
 		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}
 	result := h.usecase.CreateBook(c.Request().Context(), book)

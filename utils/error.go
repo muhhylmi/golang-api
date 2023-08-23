@@ -1,6 +1,10 @@
 package utils
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+)
 
 // CommonError struct
 type CommonError struct {
@@ -39,4 +43,14 @@ func NewConflict() Conflict {
 	errObj.Code = http.StatusConflict
 
 	return errObj
+}
+
+func BindValidate(c echo.Context, i interface{}) error {
+	if err := c.Bind(i); err != nil {
+		return err
+	}
+	if err := c.Validate(i); err != nil {
+		return err
+	}
+	return nil
 }
