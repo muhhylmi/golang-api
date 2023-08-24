@@ -6,6 +6,8 @@ import (
 	"golang-api/utils"
 )
 
+const contextName = "modules.books.usecase"
+
 type Usecases interface {
 	CreateBook(ctx context.Context, payload *web.RequestCreateBook) utils.Result
 	GetBook(ctx context.Context) utils.Result

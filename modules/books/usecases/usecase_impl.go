@@ -6,22 +6,28 @@ import (
 	"golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	"golang-api/utils"
+
+	"github.com/sirupsen/logrus"
 )
 
 type UsecaseImpl struct {
+	logger     *logrus.Logger
 	repository repositories.Repository
 }
 
-func NewUsecaseImpl(repository repositories.Repository) Usecases {
+func NewUsecaseImpl(logger *logrus.Logger, repository repositories.Repository) Usecases {
 	return &UsecaseImpl{
+		logger:     logger,
 		repository: repository,
 	}
 }
 
 func (usecase *UsecaseImpl) GetBook(ctx context.Context) utils.Result {
+	log := utils.LogWithContext(usecase.logger, "UseCase", "GetBook")
 	var result utils.Result
 	categories, err := usecase.repository.FindAll()
 	if err != nil {
+		log.Error("Book is not found")
 		error := utils.NewBadRequest()
 		result.Error = error
 		return result

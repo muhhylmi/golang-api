@@ -3,16 +3,19 @@ package repositories
 import (
 	"golang-api/modules/books/models/domain"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type RepositoryImpl struct {
-	db *gorm.DB
+	logger *logrus.Logger
+	db     *gorm.DB
 }
 
-func NewRepositoryImpl(db *gorm.DB) Repository {
+func NewRepositoryImpl(logger *logrus.Logger, db *gorm.DB) Repository {
 	return &RepositoryImpl{
-		db: db,
+		logger: logger,
+		db:     db,
 	}
 }
 
