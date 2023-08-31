@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"golang-api/config"
 	"golang-api/db"
 	"golang-api/utils"
 	"net/http"
@@ -11,6 +13,7 @@ import (
 )
 
 func main() {
+	config := config.GetConfig()
 	logger := utils.Newlogger()
 	db := db.InitPostgres(logger)
 	e := echo.New()
@@ -22,5 +25,5 @@ func main() {
 	booksGroup := e.Group("/books")
 	books.New(logger, db).Mount(booksGroup)
 
-	e.Logger.Fatal(e.Start(":1234"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", config.HOST)))
 }
