@@ -55,7 +55,7 @@ func getErrorStatusCode(err interface{}) CommonError {
 	errData := CommonError{}
 
 	switch obj := err.(type) {
-	case BadRequest:
+	case RespondError:
 		errData.ResponseCode = http.StatusBadRequest
 		errData.Code = obj.Code
 		errData.Data = obj.Data

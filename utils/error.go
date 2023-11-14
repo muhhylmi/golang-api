@@ -2,8 +2,6 @@ package utils
 
 import (
 	"net/http"
-
-	"github.com/labstack/echo/v4"
 )
 
 // CommonError struct
@@ -15,17 +13,25 @@ type CommonError struct {
 }
 
 // BadRequest struct
-type BadRequest struct {
+type RespondError struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
 
 // NewBadRequest
-func NewBadRequest() BadRequest {
-	errObj := BadRequest{}
+func NewBadRequest() RespondError {
+	errObj := RespondError{}
 	errObj.Message = "Bad Request"
 	errObj.Code = http.StatusBadRequest
+
+	return errObj
+}
+
+func NewNotFound() RespondError {
+	errObj := RespondError{}
+	errObj.Message = "Not Found"
+	errObj.Code = http.StatusNotFound
 
 	return errObj
 }
@@ -43,14 +49,4 @@ func NewConflict() Conflict {
 	errObj.Code = http.StatusConflict
 
 	return errObj
-}
-
-func BindValidate(c echo.Context, i interface{}) error {
-	if err := c.Bind(i); err != nil {
-		return err
-	}
-	if err := c.Validate(i); err != nil {
-		return err
-	}
-	return nil
 }
