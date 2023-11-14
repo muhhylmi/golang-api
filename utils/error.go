@@ -20,17 +20,17 @@ type RespondError struct {
 }
 
 // NewBadRequest
-func NewBadRequest() RespondError {
+func NewBadRequest(message string) RespondError {
 	errObj := RespondError{}
-	errObj.Message = "Bad Request"
+	errObj.Message = message
 	errObj.Code = http.StatusBadRequest
 
 	return errObj
 }
 
-func NewNotFound() RespondError {
+func NewNotFound(message string) RespondError {
 	errObj := RespondError{}
-	errObj.Message = "Not Found"
+	errObj.Message = message
 	errObj.Code = http.StatusNotFound
 
 	return errObj

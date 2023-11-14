@@ -29,7 +29,7 @@ func (usecase *UsecaseImpl) GetBook(ctx context.Context) utils.Result {
 	categories, err := usecase.repository.FindAll()
 	if err != nil {
 		log.Error("Book is not found")
-		error := utils.NewBadRequest()
+		error := utils.NewBadRequest("Book Is Not Found")
 		result.Error = error
 		return result
 	}
@@ -47,7 +47,7 @@ func (usecase *UsecaseImpl) CreateBook(ctx context.Context, payload *web.Request
 	}
 	book, err := usecase.repository.Save(&bookData)
 	if err != nil {
-		error := utils.NewBadRequest()
+		error := utils.NewBadRequest("Cannot Create Book")
 		result.Error = error
 		return result
 	}
@@ -59,7 +59,7 @@ func (usecase *UsecaseImpl) DeleteBook(ctx context.Context, payload *web.Request
 	var result utils.Result
 	book, err := usecase.repository.Delete(payload.Id)
 	if err != nil {
-		error := utils.NewBadRequest()
+		error := utils.NewBadRequest("Cannot delete book")
 		result.Error = error
 		return result
 	}
@@ -77,7 +77,7 @@ func (usecase *UsecaseImpl) UpdateBook(ctx context.Context, payload *web.Request
 	}
 	book, err := usecase.repository.Update(&bookData)
 	if err != nil {
-		error := utils.NewBadRequest()
+		error := utils.NewBadRequest("cannot update book")
 		result.Error = error
 		return result
 	}
@@ -89,7 +89,7 @@ func (usecase *UsecaseImpl) GetDetailBook(ctx context.Context, payload *web.Requ
 	var result utils.Result
 	book, err := usecase.repository.FindById(payload.Id)
 	if err != nil {
-		error := utils.NewNotFound()
+		error := utils.NewNotFound("Books Is not Found")
 		result.Error = error
 		return result
 	}

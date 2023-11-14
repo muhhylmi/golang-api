@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	books "golang-api/modules/books/handler"
+	users "golang-api/modules/users/handler"
 
 	"github.com/labstack/echo/v4"
 )
@@ -25,7 +26,9 @@ func main() {
 	})
 
 	booksGroup := e.Group("/books")
+	userGroup := e.Group("/users")
 	books.New(logger, db).Mount(booksGroup)
+	users.New(logger, db).Mount(userGroup)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", config.HOST)))
 }
