@@ -17,6 +17,8 @@ func main() {
 	logger := utils.Newlogger()
 	db := db.InitPostgres(logger)
 	e := echo.New()
+	e.Validator = utils.NewValidationUtil()
+
 	e.GET("/", func(c echo.Context) error {
 		logger.Info("This service is running properly")
 		return c.String(http.StatusOK, "This service is running properly")

@@ -18,6 +18,7 @@ type Configuration struct {
 	DB_POSTGRES_HOST     string
 	DB_POSTGRES_PORT     string
 	DB_POSTGRES_NAME     string
+	DB_POSTGRES_SCHEMA   string
 	HOST                 string
 }
 
@@ -37,6 +38,7 @@ func GetConfig() *Configuration {
 		DB_POSTGRES_HOST:     os.Getenv("DB_POSTGRES_HOST"),
 		DB_POSTGRES_PORT:     os.Getenv("DB_POSTGRES_PORT"),
 		DB_POSTGRES_NAME:     os.Getenv("DB_POSTGRES_NAME"),
+		DB_POSTGRES_SCHEMA:   os.Getenv("DB_POSTGRES_SCHEMA"),
 		HOST:                 os.Getenv("HOST_PORT"),
 	}
 }

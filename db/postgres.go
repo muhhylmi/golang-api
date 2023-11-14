@@ -21,17 +21,18 @@ func InitPostgres(logger *logrus.Logger) *gorm.DB {
 	PostgresHost := config.DB_POSTGRES_HOST
 	PostgresPort := config.DB_POSTGRES_PORT
 	PostgresDBName := config.DB_POSTGRES_NAME
+	PostgresSchema := config.DB_POSTGRES_SCHEMA
 
-	dsn := "host=" + PostgresHost + " user=" + PostgresUsername + " password=" + PostgresPassword + " dbname=" + PostgresDBName + " port=" + PostgresPort + " sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := "host=" + PostgresHost + " user=" + PostgresUsername + " password=" + PostgresPassword + " dbname=" + PostgresDBName + " port=" + PostgresPort + " sslmode=disable TimeZone=Asia/Shanghai" + " search_path=" + PostgresSchema
 	PostgresDB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "public",
+			TablePrefix: PostgresSchema,
 		},
 	})
 	if err != nil {
 		log.Info("Connection Postgres is Failed")
 		panic(err)
 	}
-	log.Info("Success connect to database")
+	log.Info("Success connect to database", PostgresDB.Config)
 	return PostgresDB
 }

@@ -5,7 +5,6 @@ import (
 	"golang-api/modules/books/repositories"
 	"golang-api/modules/books/usecases"
 	"golang-api/utils"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -52,22 +51,23 @@ func (h *HTTPHandler) CreateBook(c echo.Context) error {
 	log := utils.LogWithContext(h.logger, contextName, "CreateBook")
 	book := new(models.RequestCreateBook)
 	if err := utils.BindValidate(c, book); err != nil {
-		log.Error("validation on request create book is failed")
+		log.Error(err)
 		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}
+
 	result := h.usecase.CreateBook(c.Request().Context(), book)
 	if result.Error != nil {
 		return utils.ResponseError(result.Error, c)
 	}
 
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
 }
 
 func (h *HTTPHandler) UpdateBook(c echo.Context) error {
 	log := utils.LogWithContext(h.logger, contextName, "CreateBook")
 	book := new(models.RequestUpdateBook)
-	if err := c.Bind(book); err != nil {
-		log.Error("validation on request update book is failed")
+	if err := utils.BindValidate(c, book); err != nil {
+		log.Error(err)
 		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}
 	result := h.usecase.UpdateBook(c.Request().Context(), book)
@@ -80,8 +80,8 @@ func (h *HTTPHandler) UpdateBook(c echo.Context) error {
 func (h *HTTPHandler) DeleteBook(c echo.Context) error {
 	log := utils.LogWithContext(h.logger, contextName, "CreateBook")
 	id := new(models.RequestDeleteBook)
-	if err := c.Bind(id); err != nil {
-		log.Error("validation on request update book is failed")
+	if err := utils.BindValidate(c, id); err != nil {
+		log.Error(err)
 		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}
 	result := h.usecase.DeleteBook(c.Request().Context(), id)
@@ -92,13 +92,14 @@ func (h *HTTPHandler) DeleteBook(c echo.Context) error {
 }
 
 func (h *HTTPHandler) GetDetailBook(c echo.Context) error {
+	log := utils.LogWithContext(h.logger, contextName, "GetDetailBook")
 	id := new(models.RequestDetailBook)
-	if err := c.Bind(id); err != nil {
+	if err := utils.BindValidate(c, id); err != nil {
+		log.Error(err)
 		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}
 	result := h.usecase.GetDetailBook(c.Request().Context(), id)
 	if result.Error != nil {
-		log.Println(result.Error)
 		return utils.ResponseError(result.Error, c)
 	}
 	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
