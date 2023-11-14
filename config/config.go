@@ -20,6 +20,9 @@ type Configuration struct {
 	DB_POSTGRES_NAME     string
 	DB_POSTGRES_SCHEMA   string
 	HOST                 string
+	BASIC_AUTH_USERNAME  string
+	BASIC_AUTH_PASSWORD  string
+	JWT_SECRET_KEY       string
 }
 
 func GetConfig() *Configuration {
@@ -40,5 +43,8 @@ func GetConfig() *Configuration {
 		DB_POSTGRES_NAME:     os.Getenv("DB_POSTGRES_NAME"),
 		DB_POSTGRES_SCHEMA:   os.Getenv("DB_POSTGRES_SCHEMA"),
 		HOST:                 os.Getenv("HOST_PORT"),
+		BASIC_AUTH_USERNAME:  os.Getenv("BASIC_AUTH_USERNAME"),
+		BASIC_AUTH_PASSWORD:  os.Getenv("BASIC_AUTH_PASSWORD"),
+		JWT_SECRET_KEY:       os.Getenv("JWT_SECRET_KEY"),
 	}
 }

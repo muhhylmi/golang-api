@@ -10,4 +10,5 @@ const contextName = "modules.users.usecase"
 
 type Usecases interface {
 	CreateUser(ctx context.Context, payload *web.RequestCreateUser) utils.Result
+	LoginUser(ctx context.Context, payload *web.RequestLogin) utils.Result
 }

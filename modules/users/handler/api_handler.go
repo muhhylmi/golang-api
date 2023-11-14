@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"golang-api/middlewares"
 	models "golang-api/modules/users/models/web"
 	"golang-api/modules/users/repositories"
 	"golang-api/modules/users/usecases"
@@ -31,7 +32,8 @@ func New(logger *logrus.Logger, db *gorm.DB) *HTTPHandler {
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.POST("", h.CreateUser)
+	echoGroup.POST("/", h.CreateUser)
+	echoGroup.POST("/login", h.LoginUser, middlewares.VerifyBasicAuth())
 }
 
 func (h *HTTPHandler) CreateUser(c echo.Context) error {
@@ -43,6 +45,22 @@ func (h *HTTPHandler) CreateUser(c echo.Context) error {
 	}
 
 	result := h.usecase.CreateUser(c.Request().Context(), user)
+	if result.Error != nil {
+		return utils.ResponseError(result.Error, c)
+	}
+
+	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
+}
+
+func (h *HTTPHandler) LoginUser(c echo.Context) error {
+	log := utils.LogWithContext(h.logger, contextName, "LoginUser")
+	user := new(models.RequestLogin)
+	if err := utils.BindValidate(c, user); err != nil {
+		log.Error(err)
+		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
+	}
+
+	result := h.usecase.LoginUser(c.Request().Context(), user)
 	if result.Error != nil {
 		return utils.ResponseError(result.Error, c)
 	}
