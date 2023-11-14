@@ -1,1 +1,7 @@
 .env
+
+go.sum
+
+app
+
+app.exe
