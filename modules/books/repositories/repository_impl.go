@@ -35,12 +35,12 @@ func (repository *RepositoryImpl) Update(book *domain.Book) (*domain.Book, error
 	return book, result.Error
 }
 
-func (repository *RepositoryImpl) Delete(id uint) (uint, error) {
-	result := repository.db.Delete(&domain.Book{}, id)
+func (repository *RepositoryImpl) Delete(id string) (string, error) {
+	result := repository.db.Delete(&domain.Book{Id: id})
 	return id, result.Error
 }
 
-func (repository *RepositoryImpl) FindById(id uint) (*domain.Book, error) {
+func (repository *RepositoryImpl) FindById(id string) (*domain.Book, error) {
 	var book *domain.Book
 	result := repository.db.Where(&domain.Book{Id: id}).First(&book)
 	return book, result.Error

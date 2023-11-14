@@ -1,10 +1,10 @@
 package domain
 
 type Book struct {
-	Id     uint   `gorm:"column:id;primaryKey;autoIncrement"`
-	Title  string `gorm:"column:tittle"`
+	Id     string `gorm:"column:id;primaryKey"`
+	Title  string `gorm:"column:title"`
 	Author string `gorm:"column:author"`
-	Year   int64  `gorm:"column:year"`
+	Year   string `gorm:"column:year"`
 }
 
 func (Book) TableName() string {

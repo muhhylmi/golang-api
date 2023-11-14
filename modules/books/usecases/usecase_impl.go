@@ -7,6 +7,7 @@ import (
 	"golang-api/modules/books/repositories"
 	"golang-api/utils"
 
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,6 +40,7 @@ func (usecase *UsecaseImpl) GetBook(ctx context.Context) utils.Result {
 func (usecase *UsecaseImpl) CreateBook(ctx context.Context, payload *web.RequestCreateBook) utils.Result {
 	var result utils.Result
 	bookData := domain.Book{
+		Id:     uuid.New().String(),
 		Title:  payload.Title,
 		Author: payload.Author,
 		Year:   payload.Year,
@@ -87,7 +89,7 @@ func (usecase *UsecaseImpl) GetDetailBook(ctx context.Context, payload *web.Requ
 	var result utils.Result
 	book, err := usecase.repository.FindById(payload.Id)
 	if err != nil {
-		error := utils.NewBadRequest()
+		error := utils.NewNotFound()
 		result.Error = error
 		return result
 	}
