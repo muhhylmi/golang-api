@@ -1,12 +1,20 @@
 package utils
 
 import (
+	"fmt"
 	"golang-api/config"
 	"golang-api/modules/users/models/domain"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/gommon/log"
 )
+
+type ClaimToken struct {
+	UserId   string `json:"userId"`
+	Username string `json:"username"`
+	Gender   string `json:"gender"`
+}
 
 func CreateToken(user *domain.Users) (string, error) {
 	config := config.GetConfig()
@@ -28,4 +36,26 @@ func CreateToken(user *domain.Users) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func ValidateJwt(tokenString string) (*ClaimToken, error) {
+	config := config.GetConfig()
+	var secretKey = []byte(config.JWT_SECRET_KEY)
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return secretKey, nil
+	})
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+
+	tokenClaim := ClaimToken{
+		UserId:   token.Claims.(jwt.MapClaims)["id"].(string),
+		Username: token.Claims.(jwt.MapClaims)["username"].(string),
+		Gender:   token.Claims.(jwt.MapClaims)["gender"].(string),
+	}
+	return &tokenClaim, nil
 }

@@ -6,6 +6,7 @@ import (
 	"golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	"golang-api/utils"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -40,10 +41,12 @@ func (usecase *UsecaseImpl) GetBook(ctx context.Context) utils.Result {
 func (usecase *UsecaseImpl) CreateBook(ctx context.Context, payload *web.RequestCreateBook) utils.Result {
 	var result utils.Result
 	bookData := domain.Book{
-		Id:     uuid.New().String(),
-		Title:  payload.Title,
-		Author: payload.Author,
-		Year:   payload.Year,
+		Id:        uuid.New().String(),
+		Title:     payload.Title,
+		Author:    payload.Author,
+		Year:      payload.Year,
+		CreatedBy: payload.Token.UserId,
+		CreatedAt: time.Now().Unix(),
 	}
 	book, err := usecase.repository.Save(&bookData)
 	if err != nil {

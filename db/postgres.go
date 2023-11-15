@@ -33,6 +33,6 @@ func InitPostgres(logger *logrus.Logger) *gorm.DB {
 		log.Info("Connection Postgres is Failed")
 		panic(err)
 	}
-	log.Info("Success connect to database", PostgresDB.Config)
+	log.Info("Success connect to database")
 	return PostgresDB
 }

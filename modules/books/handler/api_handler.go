@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"golang-api/middlewares"
 	models "golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	"golang-api/modules/books/usecases"
@@ -31,11 +32,11 @@ func New(logger *logrus.Logger, db *gorm.DB) *HTTPHandler {
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.GET("", h.GetAllBook)
-	echoGroup.POST("", h.CreateBook)
-	echoGroup.PUT("/:id", h.UpdateBook)
-	echoGroup.DELETE("/:id", h.DeleteBook)
-	echoGroup.GET("/:id", h.GetDetailBook)
+	echoGroup.GET("/", h.GetAllBook, middlewares.VerifyBearer())
+	echoGroup.POST("/", h.CreateBook, middlewares.VerifyBearer())
+	echoGroup.PUT("/:id", h.UpdateBook, middlewares.VerifyBearer())
+	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer())
+	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer())
 }
 
 func (h *HTTPHandler) GetAllBook(c echo.Context) error {
@@ -50,6 +51,7 @@ func (h *HTTPHandler) GetAllBook(c echo.Context) error {
 func (h *HTTPHandler) CreateBook(c echo.Context) error {
 	log := utils.LogWithContext(h.logger, contextName, "CreateBook")
 	book := new(models.RequestCreateBook)
+	book.Token = c.Get("user").(utils.ClaimToken)
 	if err := utils.BindValidate(c, book); err != nil {
 		log.Error(err)
 		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)

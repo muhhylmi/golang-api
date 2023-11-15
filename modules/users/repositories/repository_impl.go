@@ -34,3 +34,9 @@ func (repository *RepositoryImpl) FindByUsername(username string) (*domain.Users
 	result := repository.db.Where(&domain.Users{Username: username}).First(&user)
 	return user, result.Error
 }
+
+func (repository *RepositoryImpl) FindById(id string) (*domain.Users, error) {
+	var user *domain.Users
+	result := repository.db.Where(&domain.Users{Id: id}).First(&user)
+	return user, result.Error
+}

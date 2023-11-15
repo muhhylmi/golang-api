@@ -1,10 +1,14 @@
 package web
 
+import "golang-api/utils"
+
 type (
 	RequestCreateBook struct {
 		Title  string `json:"title" validate:"required"`
 		Author string `json:"author" validate:"required"`
 		Year   string `json:"year" validate:"required"`
+
+		Token utils.ClaimToken
 	}
 
 	RequestUpdateBook struct {
