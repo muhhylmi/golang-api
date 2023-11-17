@@ -32,7 +32,7 @@ func New(logger *logrus.Logger, db *gorm.DB) *HTTPHandler {
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.POST("/", h.CreateUser, middlewares.VerifyBasicAuth())
+	echoGroup.POST("", h.CreateUser, middlewares.VerifyBasicAuth())
 	echoGroup.POST("/login", h.LoginUser, middlewares.VerifyBasicAuth())
 }
 

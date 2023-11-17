@@ -25,7 +25,7 @@ func NewUsecaseImpl(logger *logrus.Logger, repository repositories.Repository) U
 }
 
 func (usecase *UsecaseImpl) GetBook(ctx context.Context) utils.Result {
-	log := utils.LogWithContext(usecase.logger, "UseCase", "GetBook")
+	log := utils.LogWithContext(usecase.logger, contextName, "GetBook")
 	var result utils.Result
 	categories, err := usecase.repository.FindAll()
 	if err != nil {
@@ -39,17 +39,20 @@ func (usecase *UsecaseImpl) GetBook(ctx context.Context) utils.Result {
 }
 
 func (usecase *UsecaseImpl) CreateBook(ctx context.Context, payload *web.RequestCreateBook) utils.Result {
+	log := utils.LogWithContext(usecase.logger, contextName, "CreateBook")
 	var result utils.Result
 	bookData := domain.Book{
 		Id:        uuid.New().String(),
 		Title:     payload.Title,
 		Author:    payload.Author,
 		Year:      payload.Year,
+		Price:     payload.Price,
 		CreatedBy: payload.Token.UserId,
 		CreatedAt: time.Now().Unix(),
 	}
 	book, err := usecase.repository.Save(&bookData)
 	if err != nil {
+		log.Error(err.Error())
 		error := utils.NewBadRequest("Cannot Create Book")
 		result.Error = error
 		return result
@@ -73,10 +76,12 @@ func (usecase *UsecaseImpl) DeleteBook(ctx context.Context, payload *web.Request
 func (usecase *UsecaseImpl) UpdateBook(ctx context.Context, payload *web.RequestUpdateBook) utils.Result {
 	var result utils.Result
 	bookData := domain.Book{
-		Id:     payload.Id,
-		Title:  payload.Title,
-		Author: payload.Author,
-		Year:   payload.Year,
+		Id:        payload.Id,
+		Title:     payload.Title,
+		Price:     payload.Price,
+		Author:    payload.Author,
+		Year:      payload.Year,
+		UpdatedBy: payload.Token.UserId,
 	}
 	book, err := usecase.repository.Update(&bookData)
 	if err != nil {

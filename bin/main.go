@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	books "golang-api/modules/books/handler"
+	carts "golang-api/modules/cart/handler"
 	users "golang-api/modules/users/handler"
 
 	"github.com/labstack/echo/v4"
@@ -27,8 +28,10 @@ func main() {
 
 	booksGroup := e.Group("/books")
 	userGroup := e.Group("/users")
+	cartGroup := e.Group("/cart")
 	books.New(logger, db).Mount(booksGroup)
 	users.New(logger, db).Mount(userGroup)
+	carts.New(logger, db).Mount(cartGroup)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", config.HOST)))
 }

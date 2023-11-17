@@ -3,17 +3,18 @@ package db
 import (
 	"golang-api/config"
 	"golang-api/utils"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
+	"gorm.io/gorm/logger"
 )
 
 var PostgresDB *gorm.DB
 
-func InitPostgres(logger *logrus.Logger) *gorm.DB {
-	log := utils.LogWithContext(logger, "dbConnection", "InitPostgres")
+func InitPostgres(logUtils *logrus.Logger) *gorm.DB {
+	log := utils.LogWithContext(logUtils, "dbConnection", "InitPostgres")
 	config := config.GetConfig()
 
 	PostgresUsername := config.DB_POSTGRES_USERNAME
@@ -25,10 +26,18 @@ func InitPostgres(logger *logrus.Logger) *gorm.DB {
 
 	dsn := "host=" + PostgresHost + " user=" + PostgresUsername + " password=" + PostgresPassword + " dbname=" + PostgresDBName + " port=" + PostgresPort + " sslmode=disable TimeZone=Asia/Shanghai" + " search_path=" + PostgresSchema
 	PostgresDB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: PostgresSchema,
-		},
+		Logger: logger.New(
+			logUtils,
+			logger.Config{
+				SlowThreshold:             100 * time.Millisecond,
+				LogLevel:                  logger.Info,
+				Colorful:                  true,
+				IgnoreRecordNotFoundError: false,
+				ParameterizedQueries:      false,
+			},
+		),
 	})
+
 	if err != nil {
 		log.Info("Connection Postgres is Failed")
 		panic(err)

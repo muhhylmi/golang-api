@@ -2,8 +2,7 @@ package middlewares
 
 import (
 	"golang-api/config"
-	"golang-api/db"
-	userRepo "golang-api/modules/users/repositories"
+	"golang-api/modules/users/repositories"
 	"golang-api/utils"
 
 	"net/http"
@@ -27,10 +26,10 @@ func VerifyBasicAuth() echo.MiddlewareFunc {
 	})
 }
 
-func VerifyBearer() echo.MiddlewareFunc {
+func VerifyBearer(logger *logrus.Logger, repository repositories.Repository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			log := utils.LogWithContext(logrus.New(), contextName, "VerifyBearer")
+			log := utils.LogWithContext(logger, contextName, "VerifyBearer")
 			tokenString := strings.TrimPrefix(c.Request().Header.Get(echo.HeaderAuthorization), "Bearer ")
 
 			if len(tokenString) == 0 {
@@ -38,10 +37,12 @@ func VerifyBearer() echo.MiddlewareFunc {
 			}
 			token, err := utils.ValidateJwt(tokenString)
 			if err != nil {
+				log.Error(err.Error())
 				return utils.Response(nil, err.Error(), http.StatusUnauthorized, c)
 			}
-			checkUser, err := userRepo.NewRepositoryImpl(log.Logger, db.InitPostgres(log.Logger)).FindById(token.UserId)
+			checkUser, err := repository.FindById(token.UserId)
 			if err != nil {
+				log.Error(err.Error())
 				return utils.Response(nil, "invalid user!", http.StatusUnauthorized, c)
 			}
 			claimToken := utils.ClaimToken{

@@ -28,8 +28,8 @@ func (usecase *UsecaseImpl) CreateUser(ctx context.Context, payload *web.Request
 	log := utils.LogWithContext(usecase.logger, contextName, "CreateBook")
 	var result utils.Result
 
-	checkUser, _ := usecase.repository.FindByUsername(payload.Username)
-	if checkUser != nil {
+	_, err := usecase.repository.FindByUsername(payload.Username)
+	if err == nil {
 		error := utils.NewBadRequest("User Already Exists")
 		result.Error = error
 		return result
