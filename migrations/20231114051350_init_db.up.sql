@@ -1,4 +1,4 @@
-create table books (
+create table if not exists books (
     id varchar(40) not null,
     title varchar(150) not null,
     year varchar(5),

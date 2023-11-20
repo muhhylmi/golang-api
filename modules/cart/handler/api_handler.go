@@ -38,6 +38,7 @@ func New(logger *logrus.Logger, db *gorm.DB) *HTTPHandler {
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
 	echoGroup.POST("", h.CreateCart, middlewares.VerifyBearer(h.logger, h.userRepo))
+	echoGroup.GET("", h.GetAllCart, middlewares.VerifyBearer(h.logger, h.userRepo))
 }
 
 func (h *HTTPHandler) CreateCart(c echo.Context) error {
@@ -55,4 +56,20 @@ func (h *HTTPHandler) CreateCart(c echo.Context) error {
 	}
 
 	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
+}
+
+func (h *HTTPHandler) GetAllCart(c echo.Context) error {
+	log := utils.LogWithContext(h.logger, contextName, "GetAllCart")
+	cart := new(models.RequestListCart)
+	if err := utils.BindValidate(c, cart); err != nil {
+		log.Error(err)
+		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
+	}
+	result := h.usecase.GetAllCart(c.Request().Context(), cart)
+	if result.Error != nil {
+		log.Error(result.Error)
+		return utils.ResponseError(result.Error, c)
+	}
+
+	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
 }

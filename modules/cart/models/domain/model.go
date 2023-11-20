@@ -9,6 +9,7 @@ type Cart struct {
 	Id        string  `gorm:"column:id;primaryKey"`
 	UserId    string  `gorm:"column:user_id"`
 	Price     float64 `gorm:"column:price"`
+	Status    string  `gorm:"column:status"`
 	CreatedBy string  `gorm:"created_by"`
 	UpdatedBy string  `gorm:"updated_by"`
 	CreatedAt int64   `gorm:"autoCreateTime;->;<-:create;" json:"createdAt"`
@@ -26,7 +27,7 @@ type CartDetail struct {
 	Id        string `gorm:"column:id;primaryKey"`
 	CartId    string `gorm:"column:cart_id"`
 	BookId    string `gorm:"column:book_id"`
-	Status    string `gorm:"column:status"`
+	Qty       int    `gorm:"column:qty"`
 	CreatedBy string `gorm:"created_by"`
 	UpdatedBy string `gorm:"updated_by"`
 	CreatedAt int64  `gorm:"autoCreateTime;->;<-:create;" json:"createdAt"`

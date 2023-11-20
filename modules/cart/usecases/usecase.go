@@ -10,4 +10,5 @@ const contextName = "modules.carts.usecase"
 
 type Usecases interface {
 	CreateCart(ctx context.Context, payload *web.RequestCreateCart) utils.Result
+	GetAllCart(ctx context.Context, payload *web.RequestListCart) utils.Result
 }

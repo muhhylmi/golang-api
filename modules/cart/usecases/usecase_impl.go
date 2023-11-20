@@ -35,3 +35,18 @@ func (usecase *UsecaseImpl) CreateCart(ctx context.Context, payload *web.Request
 	result.Data = book
 	return result
 }
+
+func (usecase *UsecaseImpl) GetAllCart(ctx context.Context, payload *web.RequestListCart) utils.Result {
+	log := utils.LogWithContext(usecase.logger, contextName, "GetAllCart")
+	var result utils.Result
+	carts, err := usecase.repository.FindAll(payload)
+	if err != nil {
+		log.Error("Book is not found")
+		error := utils.NewBadRequest("Book Is Not Found")
+		result.Error = error
+		return result
+	}
+	responseData := web.ToResponseCart(carts)
+	result.Data = responseData
+	return result
+}

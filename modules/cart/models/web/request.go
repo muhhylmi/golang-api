@@ -10,12 +10,19 @@ import (
 type RequestCreateCart struct {
 	Price float64 `json:"price"`
 
-	Details []Details `json:"details"`
+	Details []Details `json:"details" validate:"required"`
 	Token   utils.ClaimToken
 }
 
+type RequestListCart struct {
+	Status string `params:"status" query:"status" validate:"required,oneof=created paid"`
+}
+
 type Details struct {
-	BookId string `json:"bookId"`
+	BookId   string  `json:"bookId" validate:"required"`
+	Price    float64 `json:"price"`
+	BookName string  `json:"bookName"`
+	Qty      int     `json:"qty"`
 }
 
 func (r *RequestCreateCart) ToModel() *domain.Cart {
@@ -26,7 +33,7 @@ func (r *RequestCreateCart) ToModel() *domain.Cart {
 			Id:        uuid.New().String(),
 			CartId:    cartId,
 			BookId:    detail.BookId,
-			Status:    CREATED,
+			Qty:       detail.Qty,
 			CreatedBy: r.Token.UserId,
 			UpdatedBy: r.Token.UserId,
 		})
@@ -34,6 +41,7 @@ func (r *RequestCreateCart) ToModel() *domain.Cart {
 	return &domain.Cart{
 		Id:        cartId,
 		UserId:    r.Token.UserId,
+		Status:    CREATED,
 		CreatedBy: r.Token.UserId,
 		UpdatedBy: r.Token.UserId,
 		Details:   detailCarts,
