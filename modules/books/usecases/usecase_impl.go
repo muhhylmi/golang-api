@@ -4,25 +4,11 @@ import (
 	"context"
 	"golang-api/modules/books/models/domain"
 	"golang-api/modules/books/models/web"
-	"golang-api/modules/books/repositories"
 	"golang-api/utils"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
-
-type UsecaseImpl struct {
-	logger     *logrus.Logger
-	repository repositories.Repository
-}
-
-func NewUsecaseImpl(logger *logrus.Logger, repository repositories.Repository) Usecases {
-	return &UsecaseImpl{
-		logger:     logger,
-		repository: repository,
-	}
-}
 
 func (usecase *UsecaseImpl) GetBook(ctx context.Context) utils.Result {
 	log := utils.LogWithContext(usecase.logger, contextName, "GetBook")

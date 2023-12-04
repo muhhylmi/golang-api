@@ -4,25 +4,11 @@ import (
 	"context"
 	"golang-api/modules/users/models/domain"
 	"golang-api/modules/users/models/web"
-	"golang-api/modules/users/repositories"
 	"golang-api/utils"
 
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type UsecaseImpl struct {
-	logger     *logrus.Logger
-	repository repositories.Repository
-}
-
-func NewUsecaseImpl(logger *logrus.Logger, repository repositories.Repository) Usecases {
-	return &UsecaseImpl{
-		logger:     logger,
-		repository: repository,
-	}
-}
 
 func (usecase *UsecaseImpl) CreateUser(ctx context.Context, payload *web.RequestCreateUser) utils.Result {
 	log := utils.LogWithContext(usecase.logger, contextName, "CreateBook")

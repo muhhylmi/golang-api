@@ -4,22 +4,8 @@ import (
 	"golang-api/modules/cart/models/domain"
 	"golang-api/modules/cart/models/web"
 
-	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
-
-type RepositoryImpl struct {
-	logger *logrus.Logger
-	db     *gorm.DB
-}
-
-func NewRepositoryImpl(logger *logrus.Logger, db *gorm.DB) Repository {
-	return &RepositoryImpl{
-		logger: logger,
-		db:     db,
-	}
-}
 
 func (repository *RepositoryImpl) Save(cart *domain.Cart) (*domain.Cart, error) {
 	result := repository.db.Create(&cart)
