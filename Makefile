@@ -1,3 +1,5 @@
+# Work in windows command
+# Please adjust it if use other operation system
 DB_SCHEMA := $(shell powershell.exe -Command "(Get-Content .env | Select-String 'DB_SCHEMA=').ToString().Split('=')[1]")
 DB_URI := $(shell powershell.exe -Command "(Get-Content .env | Select-String 'DB_URI=').ToString().Split('=')[1]")
 SSL_MODE := $(shell powershell.exe -Command "(Get-Content .env | Select-String 'SSLMODE=').ToString().Split('=')[1]")
