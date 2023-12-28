@@ -23,6 +23,19 @@ type Configuration struct {
 	BASIC_AUTH_USERNAME  string
 	BASIC_AUTH_PASSWORD  string
 	JWT_SECRET_KEY       string
+
+	SPREAD_SHEET_ID           string
+	SHEET_KEY_TYPE            string
+	SHEET_KEY_PROJECT_ID      string
+	SHEET_KEY_PRIVATE_KEY_ID  string
+	SHEET_KEY_PRIVATE_KEY     string
+	SHEET_KEY_CLIENT_ID       string
+	SHEET_KEY_CLIENT_EMAIL    string
+	SHEET_KEY_AUTH_URI        string
+	SHEET_KEY_TOKEN_URI       string
+	SHEET_KEY_AUTH_PROVIDER   string
+	SHEET_KEY_CLIENT_CERT_URI string
+	SHEET_KEY_UNIV_DOMAIN     string
 }
 
 func GetConfig() *Configuration {
@@ -46,5 +59,18 @@ func GetConfig() *Configuration {
 		BASIC_AUTH_USERNAME:  os.Getenv("BASIC_AUTH_USERNAME"),
 		BASIC_AUTH_PASSWORD:  os.Getenv("BASIC_AUTH_PASSWORD"),
 		JWT_SECRET_KEY:       os.Getenv("JWT_SECRET_KEY"),
+
+		SPREAD_SHEET_ID:           os.Getenv("SPREAD_SHEET_ID"),
+		SHEET_KEY_TYPE:            os.Getenv("SHEET_KEY_TYPE"),
+		SHEET_KEY_PROJECT_ID:      os.Getenv("SHEET_KEY_PROJECT_ID"),
+		SHEET_KEY_PRIVATE_KEY_ID:  os.Getenv("SHEET_KEY_PRIVATE_KEY_ID"),
+		SHEET_KEY_PRIVATE_KEY:     os.Getenv("SHEET_KEY_PRIVATE_KEY"),
+		SHEET_KEY_CLIENT_ID:       os.Getenv("SHEET_KEY_CLIENT_ID"),
+		SHEET_KEY_CLIENT_EMAIL:    os.Getenv("SHEET_KEY_CLIENT_EMAIL"),
+		SHEET_KEY_AUTH_URI:        os.Getenv("SHEET_KEY_AUTH_URI"),
+		SHEET_KEY_TOKEN_URI:       os.Getenv("SHEET_KEY_TOKEN_URI"),
+		SHEET_KEY_AUTH_PROVIDER:   os.Getenv("SHEET_KEY_AUTH_PROVIDER"),
+		SHEET_KEY_CLIENT_CERT_URI: os.Getenv("SHEET_KEY_CLIENT_CERT_URI"),
+		SHEET_KEY_UNIV_DOMAIN:     os.Getenv("SHEET_KEY_UNIV_DOMAIN"),
 	}
 }

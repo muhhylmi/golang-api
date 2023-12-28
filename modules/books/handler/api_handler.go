@@ -42,6 +42,7 @@ func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
 	echoGroup.PUT("/:id", h.UpdateBook, middlewares.VerifyBearer(h.logger, h.userRepository))
 	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer(h.logger, h.userRepository))
 	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer(h.logger, h.userRepository))
+	echoGroup.GET("/sheet", h.GetBookSheetData, middlewares.VerifyBearer(h.logger, h.userRepository))
 }
 
 func (h *HTTPHandler) GetAllBook(c echo.Context) error {
@@ -107,6 +108,16 @@ func (h *HTTPHandler) GetDetailBook(c echo.Context) error {
 	}
 	result := h.usecase.GetDetailBook(c.Request().Context(), id)
 	if result.Error != nil {
+		return utils.ResponseError(result.Error, c)
+	}
+	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+}
+
+func (h *HTTPHandler) GetBookSheetData(c echo.Context) error {
+	log := utils.LogWithContext(h.logger, contextName, "GetBookSheetData")
+	result := h.usecase.GetBookSheetData(c.Request().Context())
+	if result.Error != nil {
+		log.Error(result.Error)
 		return utils.ResponseError(result.Error, c)
 	}
 	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)

@@ -22,6 +22,9 @@ migrationchange:
 run:
 	go run bin\main.go
 
+dev:
+	air server
+
 install:
 	go mod download
 

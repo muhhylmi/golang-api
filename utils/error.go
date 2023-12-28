@@ -43,9 +43,9 @@ type Conflict struct {
 	Data    interface{} `json:"data"`
 }
 
-func NewConflict() Conflict {
+func NewConflict(message string) Conflict {
 	errObj := Conflict{}
-	errObj.Message = "Conflict"
+	errObj.Message = message
 	errObj.Code = http.StatusConflict
 
 	return errObj

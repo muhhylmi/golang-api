@@ -2,9 +2,12 @@ package usecases
 
 import (
 	"context"
+	"fmt"
+	"golang-api/config"
 	"golang-api/modules/books/models/domain"
 	"golang-api/modules/books/models/web"
 	"golang-api/utils"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -88,5 +91,54 @@ func (usecase *UsecaseImpl) GetDetailBook(ctx context.Context, payload *web.Requ
 		return result
 	}
 	result.Data = book
+	return result
+}
+
+func (usecase *UsecaseImpl) GetBookSheetData(ctx context.Context) utils.Result {
+	log := utils.LogWithContext(usecase.logger, contextName, "GetBookSheetData")
+
+	var result utils.Result
+	srv, err := utils.GetSheetConfig(log)
+	if err != nil {
+		error := utils.NewConflict("failed to get sheet config")
+		result.Error = error
+		return result
+	}
+	values, err := utils.GetSheetData(srv, config.GetConfig().SPREAD_SHEET_ID, "Sheet1!A:E")
+	if err != nil {
+		log.Error(err)
+		error := utils.NewBadRequest("failed to get sheet data")
+		result.Error = error
+		return result
+	}
+	responseData := make([]web.ResponseSheetBook, len(values.Values)-1)
+	for idx1, value := range values.Values {
+		if idx1 == 0 {
+			continue
+		}
+		count := float64(0)
+		price := float64(0)
+		for idx, data := range value {
+			if idx == 0 {
+				responseData[idx1-1].BookName = fmt.Sprintf("%v", data)
+			} else if idx == 1 {
+				responseData[idx1-1].Author = fmt.Sprintf("%v", data)
+			} else if idx == 2 {
+				responseData[idx1-1].Year = fmt.Sprintf("%v", data)
+			} else {
+				if idx == 3 {
+					temp := fmt.Sprintf("%v", data)
+					count, _ = strconv.ParseFloat(temp, 64)
+				}
+				if idx == 4 {
+					temp := fmt.Sprintf("%v", data)
+					price, _ = strconv.ParseFloat(temp, 64)
+				}
+			}
+		}
+		responseData[idx1-1].Total = count * price
+	}
+	result.Data = responseData
+
 	return result
 }

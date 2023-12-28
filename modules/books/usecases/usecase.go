@@ -21,6 +21,7 @@ type Usecases interface {
 	UpdateBook(ctx context.Context, payload *web.RequestUpdateBook) utils.Result
 	DeleteBook(ctx context.Context, payload *web.RequestDeleteBook) utils.Result
 	GetDetailBook(ctx context.Context, payload *web.RequestDetailBook) utils.Result
+	GetBookSheetData(ctx context.Context) utils.Result
 }
 
 func NewUsecaseImpl(logger *logrus.Logger, repository repositories.Repository) Usecases {

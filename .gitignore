@@ -2,6 +2,6 @@
 
 go.sum
 
-app
+app*
 
-app.exe
+tmp

@@ -62,6 +62,7 @@ func getErrorStatusCode(err interface{}) CommonError {
 		errData.Message = obj.Message
 		return errData
 	default:
+		errData.ResponseCode = http.StatusConflict
 		errData.Code = http.StatusConflict
 		return errData
 	}
