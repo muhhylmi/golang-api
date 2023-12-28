@@ -46,7 +46,7 @@ func (h *HTTPHandler) CreateUser(c echo.Context) error {
 
 	result := h.usecase.CreateUser(c.Request().Context(), user)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, c)
+		return utils.ResponseError(result.Error, result.StatusCode, c)
 	}
 
 	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
@@ -62,7 +62,7 @@ func (h *HTTPHandler) LoginUser(c echo.Context) error {
 
 	result := h.usecase.LoginUser(c.Request().Context(), user)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, c)
+		return utils.ResponseError(result.Error, result.StatusCode, c)
 	}
 
 	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)

@@ -52,7 +52,7 @@ func (h *HTTPHandler) CreateCart(c echo.Context) error {
 
 	result := h.usecase.CreateCart(c.Request().Context(), cart)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, c)
+		return utils.ResponseError(result.Error, result.StatusCode, c)
 	}
 
 	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
@@ -68,7 +68,7 @@ func (h *HTTPHandler) GetAllCart(c echo.Context) error {
 	result := h.usecase.GetAllCart(c.Request().Context(), cart)
 	if result.Error != nil {
 		log.Error(result.Error)
-		return utils.ResponseError(result.Error, c)
+		return utils.ResponseError(result.Error, result.StatusCode, c)
 	}
 
 	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
