@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package golang_api;
+
+option go_package = "./proto";
+
+import "proto/books_data.proto";
+
+service BookService {
+    rpc GrpcCreateBook (BookDataRequest) returns (BookDataResponse) {}
+}

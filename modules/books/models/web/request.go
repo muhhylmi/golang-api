@@ -30,4 +30,9 @@ type (
 	RequestDetailBook struct {
 		Id string `param:"id" validate:"required,uuid4"`
 	}
+
+	GetBookSheetRequest struct {
+		Author string `query:"author"`
+		Title  string `query:"title"`
+	}
 )

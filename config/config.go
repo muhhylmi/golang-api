@@ -23,6 +23,7 @@ type Configuration struct {
 	BASIC_AUTH_USERNAME  string
 	BASIC_AUTH_PASSWORD  string
 	JWT_SECRET_KEY       string
+	GRPC_PORT            string
 
 	SPREAD_SHEET_ID           string
 	SHEET_KEY_TYPE            string
@@ -59,6 +60,7 @@ func GetConfig() *Configuration {
 		BASIC_AUTH_USERNAME:  os.Getenv("BASIC_AUTH_USERNAME"),
 		BASIC_AUTH_PASSWORD:  os.Getenv("BASIC_AUTH_PASSWORD"),
 		JWT_SECRET_KEY:       os.Getenv("JWT_SECRET_KEY"),
+		GRPC_PORT:            os.Getenv("GRPC_PORT"),
 
 		SPREAD_SHEET_ID:           os.Getenv("SPREAD_SHEET_ID"),
 		SHEET_KEY_TYPE:            os.Getenv("SHEET_KEY_TYPE"),

@@ -33,5 +33,6 @@ func main() {
 	users.New(logger, db).Mount(userGroup)
 	carts.New(logger, db).Mount(cartGroup)
 
+	// run echo server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", config.HOST)))
 }

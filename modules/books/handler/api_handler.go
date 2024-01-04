@@ -5,6 +5,7 @@ import (
 	models "golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	userRepo "golang-api/modules/users/repositories"
+	"golang-api/proto"
 
 	"golang-api/modules/books/usecases"
 	"golang-api/utils"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 	"gorm.io/gorm"
 )
 
@@ -19,9 +21,12 @@ const contextName = "modules.books.handler"
 
 // HTTPHandler struct
 type HTTPHandler struct {
+	proto.UnimplementedBookServiceServer
+
 	logger         *logrus.Logger
 	userRepository userRepo.Repository
 	usecase        usecases.Usecases
+	grpcServer     *grpc.Server
 }
 
 // New initiation
@@ -43,6 +48,8 @@ func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
 	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer(h.logger, h.userRepository))
 	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer(h.logger, h.userRepository))
 	echoGroup.GET("/sheet", h.GetBookSheetData, middlewares.VerifyBearer(h.logger, h.userRepository))
+	// echoGroup.POST("/rpc", h.CreateBookByGrpc, middlewares.VerifyBearer(h.logger, h.userRepository))
+	// h.grpcServer.RegisterService(&proto.BookService_ServiceDesc, h)
 }
 
 func (h *HTTPHandler) GetAllBook(c echo.Context) error {
@@ -119,7 +126,13 @@ func (h *HTTPHandler) GetDetailBook(c echo.Context) error {
 
 func (h *HTTPHandler) GetBookSheetData(c echo.Context) error {
 	log := utils.LogWithContext(h.logger, contextName, "GetBookSheetData")
-	result := h.usecase.GetBookSheetData(c.Request().Context())
+	model := new(models.GetBookSheetRequest)
+	if err := utils.BindValidate(c, model); err != nil {
+		log.Error(err)
+		perr := utils.ResultFailed(utils.NewBadRequest(err.Error()), utils.ValidationError)
+		return utils.ResponseError(perr.Error, perr.StatusCode, c)
+	}
+	result := h.usecase.GetBookSheetData(c.Request().Context(), model)
 	if result.Error != nil {
 		log.Error(result.Error)
 		return utils.ResponseError(result.Error, result.StatusCode, c)
