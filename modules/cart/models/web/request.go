@@ -2,7 +2,7 @@ package web
 
 import (
 	"golang-api/modules/cart/models/domain"
-	"golang-api/utils"
+	"golang-api/utils/jwt"
 
 	"github.com/google/uuid"
 )
@@ -11,7 +11,7 @@ type RequestCreateCart struct {
 	Price float64 `json:"price"`
 
 	Details []Details `json:"details" validate:"required"`
-	Token   utils.ClaimToken
+	Token   jwt.ClaimToken
 }
 
 type RequestListCart struct {

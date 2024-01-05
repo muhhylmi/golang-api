@@ -1,9 +1,9 @@
-package utils
+package jwt
 
 import (
 	"fmt"
-	"golang-api/config"
 	"golang-api/modules/users/models/domain"
+	"golang-api/utils/config"
 	"time"
 
 	"github.com/golang-jwt/jwt"

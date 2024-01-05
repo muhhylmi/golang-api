@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"golang-api/config"
+	"golang-api/utils/config"
 	"log"
 
 	"github.com/sirupsen/logrus"

@@ -1,6 +1,8 @@
 package web
 
-import "golang-api/utils"
+import (
+	"golang-api/utils/jwt"
+)
 
 type (
 	RequestCreateBook struct {
@@ -9,7 +11,7 @@ type (
 		Year   string  `json:"year" validate:"required"`
 		Price  float64 `json:"price" validate:"required"`
 
-		Token utils.ClaimToken
+		Token jwt.ClaimToken
 	}
 
 	RequestUpdateBook struct {
@@ -19,13 +21,13 @@ type (
 		Year   string  `json:"year" validate:"required"`
 		Price  float64 `json:"price" validate:"required"`
 
-		Token utils.ClaimToken
+		Token jwt.ClaimToken
 	}
 
 	RequestDeleteBook struct {
 		Id string `param:"id" validate:"required,uuid4"`
 
-		Token utils.ClaimToken
+		Token jwt.ClaimToken
 	}
 	RequestDetailBook struct {
 		Id string `param:"id" validate:"required,uuid4"`

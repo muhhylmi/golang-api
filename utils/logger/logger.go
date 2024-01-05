@@ -1,10 +1,10 @@
-package utils
+package logger
 
 import (
 	"github.com/sirupsen/logrus"
 )
 
-func Newlogger() *logrus.Logger {
+func Newlogger() *Logger {
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.TextFormatter{
 		ForceColors:            false, // Nonaktifkan warna
@@ -16,11 +16,13 @@ func Newlogger() *logrus.Logger {
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetLevel(logrus.DebugLevel)
 
-	return logger
+	return &Logger{
+		Logger: logger,
+	}
 }
 
-func LogWithContext(logger *logrus.Logger, ctx string, scope string) *logrus.Entry {
-	return logger.WithFields(logrus.Fields{
+func (log *Logger) LogWithContext(ctx string, scope string) *logrus.Entry {
+	return log.Logger.WithFields(logrus.Fields{
 		"scope":   scope,
 		"context": ctx,
 	})

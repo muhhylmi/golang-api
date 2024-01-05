@@ -2,16 +2,15 @@ package repositories
 
 import (
 	"golang-api/modules/users/models/domain"
-
-	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
+	"golang-api/utils/database"
+	"golang-api/utils/logger"
 )
 
 const contextName = "modules.users.repository"
 
 type RepositoryImpl struct {
-	logger *logrus.Logger
-	db     *gorm.DB
+	Logger *logger.Logger
+	DB     *database.DBService
 }
 type Repository interface {
 	Save(user *domain.Users) (*domain.Users, error)
@@ -19,9 +18,9 @@ type Repository interface {
 	FindById(Id string) (*domain.Users, error)
 }
 
-func NewRepositoryImpl(logger *logrus.Logger, db *gorm.DB) Repository {
+func NewRepositoryImpl(logger *logger.Logger, db *database.DBService) Repository {
 	return &RepositoryImpl{
-		logger: logger,
-		db:     db,
+		Logger: logger,
+		DB:     db,
 	}
 }

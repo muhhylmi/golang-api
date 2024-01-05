@@ -1,16 +1,17 @@
 package middlewares
 
 import (
-	"golang-api/config"
 	"golang-api/modules/users/repositories"
-	"golang-api/utils"
+	"golang-api/utils/config"
+	"golang-api/utils/jwt"
+	"golang-api/utils/logger"
+	"golang-api/utils/wrapper"
 
 	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/sirupsen/logrus"
 )
 
 const contextName = "middleware"
@@ -26,26 +27,26 @@ func VerifyBasicAuth() echo.MiddlewareFunc {
 	})
 }
 
-func VerifyBearer(logger *logrus.Logger, repository repositories.Repository) echo.MiddlewareFunc {
+func VerifyBearer(logger *logger.Logger, repository repositories.Repository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			log := utils.LogWithContext(logger, contextName, "VerifyBearer")
+			log := logger.LogWithContext(contextName, "VerifyBearer")
 			tokenString := strings.TrimPrefix(c.Request().Header.Get(echo.HeaderAuthorization), "Bearer ")
 
 			if len(tokenString) == 0 {
-				return utils.Response(nil, "invalid token!", http.StatusUnauthorized, c)
+				return wrapper.Response(nil, "invalid token!", http.StatusUnauthorized, c)
 			}
-			token, err := utils.ValidateJwt(tokenString)
+			token, err := jwt.ValidateJwt(tokenString)
 			if err != nil {
 				log.Error(err.Error())
-				return utils.Response(nil, err.Error(), http.StatusUnauthorized, c)
+				return wrapper.Response(nil, err.Error(), http.StatusUnauthorized, c)
 			}
 			checkUser, err := repository.FindById(token.UserId)
 			if err != nil {
 				log.Error(err.Error())
-				return utils.Response(nil, "invalid user!", http.StatusUnauthorized, c)
+				return wrapper.Response(nil, "invalid user!", http.StatusUnauthorized, c)
 			}
-			claimToken := utils.ClaimToken{
+			claimToken := jwt.ClaimToken{
 				UserId:   checkUser.Id,
 				Username: checkUser.Username,
 				Gender:   checkUser.Gender,

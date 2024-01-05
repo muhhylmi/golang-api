@@ -8,13 +8,13 @@ import (
 )
 
 func (repository *RepositoryImpl) Save(cart *domain.Cart) (*domain.Cart, error) {
-	result := repository.db.Create(&cart)
+	result := repository.DB.Gorm.Create(&cart)
 	return cart, result.Error
 }
 
 func (repository *RepositoryImpl) FindAll(payload *web.RequestListCart) ([]*domain.Cart, error) {
 	var carts []*domain.Cart
-	tx := repository.db.
+	tx := repository.DB.Gorm.
 		Where("status = ?", payload.Status).
 		Preload(clause.Associations).
 		Preload("Details.Books").

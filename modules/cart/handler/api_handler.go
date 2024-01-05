@@ -1,75 +1,77 @@
 package handler
 
 import (
-	"golang-api/middlewares"
 	models "golang-api/modules/cart/models/web"
 	"golang-api/modules/cart/repositories"
 	userRepo "golang-api/modules/users/repositories"
+	"golang-api/utils/app"
+	"golang-api/utils/jwt"
+	"golang-api/utils/logger"
+	"golang-api/utils/middlewares"
+	"golang-api/utils/wrapper"
 
 	"golang-api/modules/cart/usecases"
 	"golang-api/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
 const contextName = "modules.cart.handler"
 
 // HTTPHandler struct
 type HTTPHandler struct {
-	logger   *logrus.Logger
-	usecase  usecases.Usecases
-	userRepo userRepo.Repository
+	Logger   *logger.Logger
+	UseCase  usecases.Usecases
+	UserRepo userRepo.Repository
 }
 
 // New initiation
-func New(logger *logrus.Logger, db *gorm.DB) *HTTPHandler {
-	userRepo := userRepo.NewRepositoryImpl(logger, db)
-	repository := repositories.NewRepositoryImpl(logger, db)
-	usecaseImpl := usecases.NewUsecaseImpl(logger, repository)
+func New(apps *app.App) *HTTPHandler {
+	userRepo := userRepo.NewRepositoryImpl(apps.Logger, apps.DBService)
+	repository := repositories.NewRepositoryImpl(apps.Logger, apps.DBService)
+	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository)
 	return &HTTPHandler{
-		logger:   logger,
-		userRepo: userRepo,
-		usecase:  usecaseImpl,
+		Logger:   apps.Logger,
+		UserRepo: userRepo,
+		UseCase:  usecaseImpl,
 	}
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.POST("", h.CreateCart, middlewares.VerifyBearer(h.logger, h.userRepo))
-	echoGroup.GET("", h.GetAllCart, middlewares.VerifyBearer(h.logger, h.userRepo))
+	echoGroup.POST("", h.CreateCart, middlewares.VerifyBearer(h.Logger, h.UserRepo))
+	echoGroup.GET("", h.GetAllCart, middlewares.VerifyBearer(h.Logger, h.UserRepo))
 }
 
 func (h *HTTPHandler) CreateCart(c echo.Context) error {
-	log := utils.LogWithContext(h.logger, contextName, "CreateCart")
+	log := h.Logger.LogWithContext(contextName, "CreateCart")
 	cart := new(models.RequestCreateCart)
-	cart.Token = c.Get("user").(utils.ClaimToken)
+	cart.Token = c.Get("user").(jwt.ClaimToken)
 	if err := utils.BindValidate(c, cart); err != nil {
 		log.Error(err)
-		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
+		return wrapper.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}
 
-	result := h.usecase.CreateCart(c.Request().Context(), cart)
+	result := h.UseCase.CreateCart(c.Request().Context(), cart)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
 
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
 }
 
 func (h *HTTPHandler) GetAllCart(c echo.Context) error {
-	log := utils.LogWithContext(h.logger, contextName, "GetAllCart")
+	log := h.Logger.LogWithContext(contextName, "GetAllCart")
 	cart := new(models.RequestListCart)
 	if err := utils.BindValidate(c, cart); err != nil {
 		log.Error(err)
-		return utils.Response(nil, err.Error(), http.StatusBadRequest, c)
+		return wrapper.Response(nil, err.Error(), http.StatusBadRequest, c)
 	}
-	result := h.usecase.GetAllCart(c.Request().Context(), cart)
+	result := h.UseCase.GetAllCart(c.Request().Context(), cart)
 	if result.Error != nil {
 		log.Error(result.Error)
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
 
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
 }

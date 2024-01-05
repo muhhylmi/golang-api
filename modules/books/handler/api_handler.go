@@ -1,20 +1,22 @@
 package handler
 
 import (
-	"golang-api/middlewares"
 	models "golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	userRepo "golang-api/modules/users/repositories"
 	"golang-api/proto"
+	"golang-api/utils/app"
+	"golang-api/utils/jwt"
+	"golang-api/utils/logger"
+	"golang-api/utils/middlewares"
+	"golang-api/utils/wrapper"
 
 	"golang-api/modules/books/usecases"
 	"golang-api/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"gorm.io/gorm"
 )
 
 const contextName = "modules.books.handler"
@@ -23,119 +25,122 @@ const contextName = "modules.books.handler"
 type HTTPHandler struct {
 	proto.UnimplementedBookServiceServer
 
-	logger         *logrus.Logger
-	userRepository userRepo.Repository
-	usecase        usecases.Usecases
-	grpcServer     *grpc.Server
+	Logger         *logger.Logger
+	UserRepository userRepo.Repository
+	Usecase        usecases.Usecases
+	Validator      echo.Validator
+
+	GrpcServer *grpc.Server
 }
 
 // New initiation
-func New(logger *logrus.Logger, db *gorm.DB) *HTTPHandler {
-	userRepo := userRepo.NewRepositoryImpl(logger, db)
-	repository := repositories.NewRepositoryImpl(logger, db)
-	usecaseImpl := usecases.NewUsecaseImpl(logger, repository)
+func New(apps *app.App) *HTTPHandler {
+	userRepo := userRepo.NewRepositoryImpl(apps.Logger, apps.DBService)
+	repository := repositories.NewRepositoryImpl(apps.Logger, apps.DBService)
+	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository)
 	return &HTTPHandler{
-		logger:         logger,
-		userRepository: userRepo,
-		usecase:        usecaseImpl,
+		Logger:         apps.Logger,
+		UserRepository: userRepo,
+		Usecase:        usecaseImpl,
+		Validator:      apps.Validator,
 	}
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.GET("", h.GetAllBook, middlewares.VerifyBearer(h.logger, h.userRepository))
-	echoGroup.POST("", h.CreateBook, middlewares.VerifyBearer(h.logger, h.userRepository))
-	echoGroup.PUT("/:id", h.UpdateBook, middlewares.VerifyBearer(h.logger, h.userRepository))
-	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer(h.logger, h.userRepository))
-	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer(h.logger, h.userRepository))
-	echoGroup.GET("/sheet", h.GetBookSheetData, middlewares.VerifyBearer(h.logger, h.userRepository))
-	// echoGroup.POST("/rpc", h.CreateBookByGrpc, middlewares.VerifyBearer(h.logger, h.userRepository))
+	echoGroup.GET("", h.GetAllBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
+	echoGroup.POST("", h.CreateBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
+	echoGroup.PUT("/:id", h.UpdateBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
+	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
+	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
+	echoGroup.GET("/sheet", h.GetBookSheetData, middlewares.VerifyBearer(h.Logger, h.UserRepository))
+	// echoGroup.POST("/rpc", h.CreateBookByGrpc, middlewares.VerifyBearer(h.Logger, h.UserRepository))
 	// h.grpcServer.RegisterService(&proto.BookService_ServiceDesc, h)
 }
 
 func (h *HTTPHandler) GetAllBook(c echo.Context) error {
-	result := h.usecase.GetBook(c.Request().Context())
+	result := h.Usecase.GetBook(c.Request().Context())
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
 
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
 }
 
 func (h *HTTPHandler) CreateBook(c echo.Context) error {
-	log := utils.LogWithContext(h.logger, contextName, "CreateBook")
+	log := h.Logger.LogWithContext(contextName, "CreateBook")
 	book := new(models.RequestCreateBook)
-	book.Token = c.Get("user").(utils.ClaimToken)
+	book.Token = c.Get("user").(jwt.ClaimToken)
 	if err := utils.BindValidate(c, book); err != nil {
 		log.Error(err)
-		perr := utils.ResultFailed(utils.NewBadRequest(err.Error()), utils.ValidationError)
-		return utils.ResponseError(perr.Error, perr.StatusCode, c)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
 
-	result := h.usecase.CreateBook(c.Request().Context(), book)
+	result := h.Usecase.CreateBook(c.Request().Context(), book)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
 
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
 }
 
 func (h *HTTPHandler) UpdateBook(c echo.Context) error {
-	log := utils.LogWithContext(h.logger, contextName, "CreateBook")
+	log := h.Logger.LogWithContext(contextName, "CreateBook")
 	book := new(models.RequestUpdateBook)
 	if err := utils.BindValidate(c, book); err != nil {
 		log.Error(err)
-		perr := utils.ResultFailed(utils.NewBadRequest(err.Error()), utils.ValidationError)
-		return utils.ResponseError(perr.Error, perr.StatusCode, c)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
-	result := h.usecase.UpdateBook(c.Request().Context(), book)
+	result := h.Usecase.UpdateBook(c.Request().Context(), book)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
 }
 
 func (h *HTTPHandler) DeleteBook(c echo.Context) error {
-	log := utils.LogWithContext(h.logger, contextName, "CreateBook")
+	log := h.Logger.LogWithContext(contextName, "CreateBook")
 	id := new(models.RequestDeleteBook)
 	if err := utils.BindValidate(c, id); err != nil {
 		log.Error(err)
-		perr := utils.ResultFailed(utils.NewBadRequest(err.Error()), utils.ValidationError)
-		return utils.ResponseError(perr.Error, perr.StatusCode, c)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
-	result := h.usecase.DeleteBook(c.Request().Context(), id)
+	result := h.Usecase.DeleteBook(c.Request().Context(), id)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
 }
 
 func (h *HTTPHandler) GetDetailBook(c echo.Context) error {
-	log := utils.LogWithContext(h.logger, contextName, "GetDetailBook")
+	log := h.Logger.LogWithContext(contextName, "GetDetailBook")
 	id := new(models.RequestDetailBook)
 	if err := utils.BindValidate(c, id); err != nil {
 		log.Error(err)
-		perr := utils.ResultFailed(utils.NewBadRequest(err.Error()), utils.ValidationError)
-		return utils.ResponseError(perr.Error, perr.StatusCode, c)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
-	result := h.usecase.GetDetailBook(c.Request().Context(), id)
+	result := h.Usecase.GetDetailBook(c.Request().Context(), id)
 	if result.Error != nil {
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
 }
 
 func (h *HTTPHandler) GetBookSheetData(c echo.Context) error {
-	log := utils.LogWithContext(h.logger, contextName, "GetBookSheetData")
+	log := h.Logger.LogWithContext(contextName, "GetBookSheetData")
 	model := new(models.GetBookSheetRequest)
 	if err := utils.BindValidate(c, model); err != nil {
 		log.Error(err)
-		perr := utils.ResultFailed(utils.NewBadRequest(err.Error()), utils.ValidationError)
-		return utils.ResponseError(perr.Error, perr.StatusCode, c)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
-	result := h.usecase.GetBookSheetData(c.Request().Context(), model)
+	result := h.Usecase.GetBookSheetData(c.Request().Context(), model)
 	if result.Error != nil {
 		log.Error(result.Error)
-		return utils.ResponseError(result.Error, result.StatusCode, c)
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
-	return utils.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
 }

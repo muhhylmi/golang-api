@@ -4,26 +4,28 @@ import (
 	"context"
 	"golang-api/modules/users/models/web"
 	"golang-api/modules/users/repositories"
-	"golang-api/utils"
-
-	"github.com/sirupsen/logrus"
+	"golang-api/utils/config"
+	"golang-api/utils/logger"
+	"golang-api/utils/wrapper"
 )
 
 const contextName = "modules.users.usecase"
 
 type UsecaseImpl struct {
-	logger     *logrus.Logger
-	repository repositories.Repository
+	Logger     *logger.Logger
+	Repository repositories.Repository
+	Config     *config.Configurations
 }
 
 type Usecases interface {
-	CreateUser(ctx context.Context, payload *web.RequestCreateUser) utils.Result
-	LoginUser(ctx context.Context, payload *web.RequestLogin) utils.Result
+	CreateUser(ctx context.Context, payload *web.RequestCreateUser) wrapper.Result
+	LoginUser(ctx context.Context, payload *web.RequestLogin) wrapper.Result
 }
 
-func NewUsecaseImpl(logger *logrus.Logger, repository repositories.Repository) Usecases {
+func NewUsecaseImpl(config *config.Configurations, logger *logger.Logger, repository repositories.Repository) Usecases {
 	return &UsecaseImpl{
-		logger:     logger,
-		repository: repository,
+		Logger:     logger,
+		Repository: repository,
+		Config:     config,
 	}
 }
