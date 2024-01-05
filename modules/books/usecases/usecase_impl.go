@@ -20,7 +20,7 @@ func (usecase *UsecaseImpl) GetBook(ctx context.Context) wrapper.Result {
 	categories, err := usecase.Repository.FindAll()
 	if err != nil {
 		log.Error("Book is not found")
-		return wrapper.ResultFailed(wrapper.NewBadRequest("Book Is Not Found"), utils.BookNotFound)
+		return wrapper.ResultFailed(wrapper.NewNotFound("Book Is Not Found"), utils.BookNotFound)
 	}
 	return wrapper.ResultSuccess(categories)
 }

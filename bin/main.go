@@ -14,7 +14,7 @@ import (
 
 func main() {
 	apps := Init()
-
+	apps.Apps.Validator = apps.Validator
 	apps.Apps.GET("/", func(c echo.Context) error {
 		apps.Logger.Logger.Info("This service is running properly")
 		return c.String(http.StatusOK, "This service is running properly")
