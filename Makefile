@@ -38,3 +38,6 @@ proto:
 
 mock:
 	mockery --all --recursive=true --keeptree
+
+test:
+	go test ./...
