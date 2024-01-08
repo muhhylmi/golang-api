@@ -1,11 +1,12 @@
 package main
 
 import (
-	"golang-api/utils"
 	"golang-api/utils/app"
 	"golang-api/utils/config"
 	"golang-api/utils/database"
+	googlesheet "golang-api/utils/google_sheet"
 	"golang-api/utils/logger"
+	utils "golang-api/utils/validator"
 
 	"github.com/labstack/echo/v4"
 )
@@ -32,12 +33,17 @@ func Init() *app.App {
 		panic(err)
 	}
 
+	gsheetService, err := googlesheet.NewGsheetService(logger)
+	if err != nil {
+		panic(err)
+	}
 	return &app.App{
-		DBService:    db,
-		Apps:         e,
-		Validator:    validator,
-		Logger:       logger,
-		GlobalConfig: config,
+		DBService:     db,
+		Apps:          e,
+		Validator:     validator,
+		Logger:        logger,
+		GlobalConfig:  config,
+		GsheetService: gsheetService,
 	}
 
 }

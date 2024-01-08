@@ -4,10 +4,10 @@ import (
 	models "golang-api/modules/users/models/web"
 	"golang-api/modules/users/repositories"
 	"golang-api/modules/users/usecases"
-	"golang-api/utils"
 	"golang-api/utils/app"
 	"golang-api/utils/logger"
 	"golang-api/utils/middlewares"
+	utils "golang-api/utils/validator"
 	"golang-api/utils/wrapper"
 	"net/http"
 

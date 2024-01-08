@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"golang-api/modules/books/models/domain"
 	"golang-api/modules/books/models/web"
-	"golang-api/utils"
+	"golang-api/utils/constant"
 	"golang-api/utils/wrapper"
 	"regexp"
 	"strconv"
@@ -20,7 +20,7 @@ func (usecase *UsecaseImpl) GetBook(ctx context.Context) wrapper.Result {
 	categories, err := usecase.Repository.FindAll()
 	if err != nil {
 		log.Error("Book is not found")
-		return wrapper.ResultFailed(wrapper.NewNotFound("Book Is Not Found"), utils.BookNotFound)
+		return wrapper.ResultFailed(wrapper.NewNotFound("Book Is Not Found"), constant.BookNotFound)
 	}
 	return wrapper.ResultSuccess(categories)
 }
@@ -39,7 +39,7 @@ func (usecase *UsecaseImpl) CreateBook(ctx context.Context, payload *web.Request
 	book, err := usecase.Repository.Save(&bookData)
 	if err != nil {
 		log.Error(err.Error())
-		return wrapper.ResultFailed(wrapper.NewBadRequest("Cannot Create Book"), utils.CreateBookFailed)
+		return wrapper.ResultFailed(wrapper.NewBadRequest("Cannot Create Book"), constant.CreateBookFailed)
 	}
 	return wrapper.ResultSuccess(book)
 }
@@ -47,7 +47,7 @@ func (usecase *UsecaseImpl) CreateBook(ctx context.Context, payload *web.Request
 func (usecase *UsecaseImpl) DeleteBook(ctx context.Context, payload *web.RequestDeleteBook) wrapper.Result {
 	book, err := usecase.Repository.Delete(payload.Id)
 	if err != nil {
-		return wrapper.ResultFailed(wrapper.NewBadRequest("Cannot delete book"), utils.DeleteBookFailed)
+		return wrapper.ResultFailed(wrapper.NewBadRequest("Cannot delete book"), constant.DeleteBookFailed)
 	}
 	return wrapper.ResultSuccess(book)
 }
@@ -63,7 +63,7 @@ func (usecase *UsecaseImpl) UpdateBook(ctx context.Context, payload *web.Request
 	}
 	book, err := usecase.Repository.Update(&bookData)
 	if err != nil {
-		return wrapper.ResultFailed(wrapper.NewBadRequest("cannot update book"), utils.UpdateBookFailed)
+		return wrapper.ResultFailed(wrapper.NewBadRequest("cannot update book"), constant.UpdateBookFailed)
 	}
 	return wrapper.ResultSuccess(book)
 }
@@ -71,7 +71,7 @@ func (usecase *UsecaseImpl) UpdateBook(ctx context.Context, payload *web.Request
 func (usecase *UsecaseImpl) GetDetailBook(ctx context.Context, payload *web.RequestDetailBook) wrapper.Result {
 	book, err := usecase.Repository.FindById(payload.Id)
 	if err != nil {
-		return wrapper.ResultFailed(wrapper.NewNotFound("Books Is not Found"), utils.BookNotFound)
+		return wrapper.ResultFailed(wrapper.NewNotFound("Books Is not Found"), constant.BookNotFound)
 	}
 	return wrapper.ResultSuccess(book)
 }
@@ -79,16 +79,11 @@ func (usecase *UsecaseImpl) GetDetailBook(ctx context.Context, payload *web.Requ
 func (usecase *UsecaseImpl) GetBookSheetData(ctx context.Context, payload *web.GetBookSheetRequest) wrapper.Result {
 	log := usecase.Logger.LogWithContext(contextName, "GetBookSheetData")
 
-	srv, err := utils.GetSheetConfig(log)
-	if err != nil {
-		error := wrapper.NewConflict("failed to get sheet config")
-		return wrapper.ResultFailed(error, utils.FailedConnectSheet)
-	}
-	values, filteredRow, err := utils.GetSheetDataWithFilter(srv, usecase.Config.SPREAD_SHEET_ID, "Sheet2!A2:E")
+	values, filteredRow, err := usecase.Gsheet.GetSheetDataWithFilter(usecase.Config.SPREAD_SHEET_ID, "Sheet2!A2:E")
 	if err != nil {
 		log.Error(err)
 		error := wrapper.NewBadRequest("failed to get sheet data")
-		return wrapper.ResultFailed(error, utils.FailedGetBookSheet)
+		return wrapper.ResultFailed(error, constant.FailedGetBookSheet)
 	}
 
 	var resultGsheet [][]interface{}
@@ -163,7 +158,7 @@ func (usecase *UsecaseImpl) CreateBookByGrpc(ctx context.Context, payload *web.R
 	book, err := usecase.Repository.Save(&bookData)
 	if err != nil {
 		log.Error(err.Error())
-		return wrapper.ResultFailed(wrapper.NewBadRequest("Cannot Create Book"), utils.CreateBookFailed)
+		return wrapper.ResultFailed(wrapper.NewBadRequest("Cannot Create Book"), constant.CreateBookFailed)
 	}
 	return wrapper.ResultSuccess(book)
 }

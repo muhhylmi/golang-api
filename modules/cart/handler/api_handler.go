@@ -3,15 +3,14 @@ package handler
 import (
 	models "golang-api/modules/cart/models/web"
 	"golang-api/modules/cart/repositories"
+	"golang-api/modules/cart/usecases"
 	userRepo "golang-api/modules/users/repositories"
 	"golang-api/utils/app"
 	"golang-api/utils/jwt"
 	"golang-api/utils/logger"
 	"golang-api/utils/middlewares"
+	utils "golang-api/utils/validator"
 	"golang-api/utils/wrapper"
-
-	"golang-api/modules/cart/usecases"
-	"golang-api/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

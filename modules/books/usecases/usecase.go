@@ -5,6 +5,7 @@ import (
 	"golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	"golang-api/utils/config"
+	googlesheet "golang-api/utils/google_sheet"
 	"golang-api/utils/logger"
 	"golang-api/utils/wrapper"
 )
@@ -15,6 +16,7 @@ type UsecaseImpl struct {
 	Logger     *logger.Logger
 	Repository repositories.Repository
 	Config     *config.Configurations
+	Gsheet     googlesheet.GoogleSheetServiceInterface
 }
 type Usecases interface {
 	CreateBook(ctx context.Context, payload *web.RequestCreateBook) wrapper.Result
@@ -25,10 +27,11 @@ type Usecases interface {
 	GetBookSheetData(ctx context.Context, payload *web.GetBookSheetRequest) wrapper.Result
 }
 
-func NewUsecaseImpl(config *config.Configurations, logger *logger.Logger, repository repositories.Repository) Usecases {
+func NewUsecaseImpl(config *config.Configurations, logger *logger.Logger, repository repositories.Repository, gsheet googlesheet.GoogleSheetServiceInterface) Usecases {
 	return &UsecaseImpl{
 		Config:     config,
 		Logger:     logger,
 		Repository: repository,
+		Gsheet:     gsheet,
 	}
 }

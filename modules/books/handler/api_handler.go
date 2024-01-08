@@ -6,13 +6,14 @@ import (
 	userRepo "golang-api/modules/users/repositories"
 	"golang-api/proto"
 	"golang-api/utils/app"
+	"golang-api/utils/constant"
 	"golang-api/utils/jwt"
 	"golang-api/utils/logger"
 	"golang-api/utils/middlewares"
+	utils "golang-api/utils/validator"
 	"golang-api/utils/wrapper"
 
 	"golang-api/modules/books/usecases"
-	"golang-api/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -37,7 +38,7 @@ type HTTPHandler struct {
 func New(apps *app.App) *HTTPHandler {
 	userRepo := userRepo.NewRepositoryImpl(apps.Logger, apps.DBService)
 	repository := repositories.NewRepositoryImpl(apps.Logger, apps.DBService)
-	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository)
+	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository, apps.GsheetService)
 	return &HTTPHandler{
 		Logger:         apps.Logger,
 		UserRepository: userRepo,
@@ -72,7 +73,7 @@ func (h *HTTPHandler) CreateBook(c echo.Context) error {
 	book.Token = c.Get("user").(jwt.ClaimToken)
 	if err := utils.BindValidate(c, book); err != nil {
 		log.Error(err)
-		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), constant.ValidationError)
 		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
 
@@ -89,7 +90,7 @@ func (h *HTTPHandler) UpdateBook(c echo.Context) error {
 	book := new(models.RequestUpdateBook)
 	if err := utils.BindValidate(c, book); err != nil {
 		log.Error(err)
-		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), constant.ValidationError)
 		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
 	result := h.Usecase.UpdateBook(c.Request().Context(), book)
@@ -104,7 +105,7 @@ func (h *HTTPHandler) DeleteBook(c echo.Context) error {
 	id := new(models.RequestDeleteBook)
 	if err := utils.BindValidate(c, id); err != nil {
 		log.Error(err)
-		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), constant.ValidationError)
 		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
 	result := h.Usecase.DeleteBook(c.Request().Context(), id)
@@ -119,7 +120,7 @@ func (h *HTTPHandler) GetDetailBook(c echo.Context) error {
 	id := new(models.RequestDetailBook)
 	if err := utils.BindValidate(c, id); err != nil {
 		log.Error(err)
-		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), constant.ValidationError)
 		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
 	result := h.Usecase.GetDetailBook(c.Request().Context(), id)
@@ -134,7 +135,7 @@ func (h *HTTPHandler) GetBookSheetData(c echo.Context) error {
 	model := new(models.GetBookSheetRequest)
 	if err := utils.BindValidate(c, model); err != nil {
 		log.Error(err)
-		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), utils.ValidationError)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), constant.ValidationError)
 		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
 	}
 	result := h.Usecase.GetBookSheetData(c.Request().Context(), model)
