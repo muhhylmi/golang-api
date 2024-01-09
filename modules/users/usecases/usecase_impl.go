@@ -68,7 +68,7 @@ func (usecase *UsecaseImpl) LoginUser(ctx context.Context, payload *web.RequestL
 		Username: checkUser.Username,
 		Gender:   checkUser.Gender,
 	}
-	token, err := jwt.CreateToken(&userData)
+	token, err := jwt.CreateToken(&userData, usecase.Config)
 	if err != nil {
 		log.Error(err)
 		error := wrapper.NewBadRequest(err.Error())

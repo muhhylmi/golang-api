@@ -6,6 +6,7 @@ import (
 	userRepo "golang-api/modules/users/repositories"
 	"golang-api/proto"
 	"golang-api/utils/app"
+	"golang-api/utils/config"
 	"golang-api/utils/constant"
 	"golang-api/utils/jwt"
 	"golang-api/utils/logger"
@@ -30,6 +31,7 @@ type HTTPHandler struct {
 	UserRepository userRepo.Repository
 	Usecase        usecases.Usecases
 	Validator      echo.Validator
+	Config         *config.Configurations
 
 	GrpcServer *grpc.Server
 }
@@ -44,16 +46,17 @@ func New(apps *app.App) *HTTPHandler {
 		UserRepository: userRepo,
 		Usecase:        usecaseImpl,
 		Validator:      apps.Validator,
+		Config:         apps.GlobalConfig,
 	}
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.GET("", h.GetAllBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
-	echoGroup.POST("", h.CreateBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
-	echoGroup.PUT("/:id", h.UpdateBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
-	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
-	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer(h.Logger, h.UserRepository))
-	echoGroup.GET("/sheet", h.GetBookSheetData, middlewares.VerifyBearer(h.Logger, h.UserRepository))
+	echoGroup.GET("", h.GetAllBook, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
+	echoGroup.POST("", h.CreateBook, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
+	echoGroup.PUT("/:id", h.UpdateBook, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
+	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
+	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
+	echoGroup.GET("/sheet", h.GetBookSheetData, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
 	// echoGroup.POST("/rpc", h.CreateBookByGrpc, middlewares.VerifyBearer(h.Logger, h.UserRepository))
 	// h.grpcServer.RegisterService(&proto.BookService_ServiceDesc, h)
 }

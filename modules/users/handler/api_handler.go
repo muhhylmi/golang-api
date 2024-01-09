@@ -5,6 +5,7 @@ import (
 	"golang-api/modules/users/repositories"
 	"golang-api/modules/users/usecases"
 	"golang-api/utils/app"
+	"golang-api/utils/config"
 	"golang-api/utils/logger"
 	"golang-api/utils/middlewares"
 	utils "golang-api/utils/validator"
@@ -20,6 +21,7 @@ const contextName = "modules.users.handler"
 type HTTPHandler struct {
 	Logger  *logger.Logger
 	UseCase usecases.Usecases
+	Config  *config.Configurations
 }
 
 // New initiation
@@ -29,12 +31,13 @@ func New(apps *app.App) *HTTPHandler {
 	return &HTTPHandler{
 		Logger:  apps.Logger,
 		UseCase: usecaseImpl,
+		Config:  apps.GlobalConfig,
 	}
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.POST("", h.CreateUser, middlewares.VerifyBasicAuth())
-	echoGroup.POST("/login", h.LoginUser, middlewares.VerifyBasicAuth())
+	echoGroup.POST("", h.CreateUser, middlewares.VerifyBasicAuth(h.Config))
+	echoGroup.POST("/login", h.LoginUser, middlewares.VerifyBasicAuth(h.Config))
 }
 
 func (h *HTTPHandler) CreateUser(c echo.Context) error {

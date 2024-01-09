@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"golang-api/utils/config"
 	"net/http"
 
 	books "golang-api/modules/books/handler"
@@ -28,5 +27,5 @@ func main() {
 	carts.New(apps).Mount(cartGroup)
 
 	// run echo server
-	apps.Apps.Logger.Fatal(apps.Apps.Start(fmt.Sprintf(":%s", config.GetConfig().HOST)))
+	apps.Apps.Logger.Fatal(apps.Apps.Start(fmt.Sprintf(":%s", apps.GlobalConfig.HOST)))
 }

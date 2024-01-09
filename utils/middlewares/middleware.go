@@ -16,9 +16,8 @@ import (
 
 const contextName = "middleware"
 
-func VerifyBasicAuth() echo.MiddlewareFunc {
+func VerifyBasicAuth(config *config.Configurations) echo.MiddlewareFunc {
 	return middleware.BasicAuth(func(username, password string, context echo.Context) (bool, error) {
-		config := config.GetConfig()
 		if username == config.BASIC_AUTH_USERNAME && password == config.BASIC_AUTH_PASSWORD {
 			return true, nil
 		}
@@ -27,7 +26,7 @@ func VerifyBasicAuth() echo.MiddlewareFunc {
 	})
 }
 
-func VerifyBearer(logger *logger.Logger, repository repositories.Repository) echo.MiddlewareFunc {
+func VerifyBearer(logger *logger.Logger, config *config.Configurations, repository repositories.Repository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			log := logger.LogWithContext(contextName, "VerifyBearer")
@@ -36,7 +35,7 @@ func VerifyBearer(logger *logger.Logger, repository repositories.Repository) ech
 			if len(tokenString) == 0 {
 				return wrapper.Response(nil, "invalid token!", http.StatusUnauthorized, c)
 			}
-			token, err := jwt.ValidateJwt(tokenString)
+			token, err := jwt.ValidateJwt(tokenString, config)
 			if err != nil {
 				log.Error(err.Error())
 				return wrapper.Response(nil, err.Error(), http.StatusUnauthorized, c)

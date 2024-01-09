@@ -16,8 +16,7 @@ type ClaimToken struct {
 	Gender   string `json:"gender"`
 }
 
-func CreateToken(user *domain.Users) (string, error) {
-	config := config.GetConfig()
+func CreateToken(user *domain.Users, config *config.Configurations) (string, error) {
 	// Membuat token
 	token := jwt.New(jwt.SigningMethodHS256)
 	var secretKey = []byte(config.JWT_SECRET_KEY)
@@ -38,8 +37,7 @@ func CreateToken(user *domain.Users) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateJwt(tokenString string) (*ClaimToken, error) {
-	config := config.GetConfig()
+func ValidateJwt(tokenString string, config *config.Configurations) (*ClaimToken, error) {
 	var secretKey = []byte(config.JWT_SECRET_KEY)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

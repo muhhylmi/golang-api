@@ -6,6 +6,7 @@ import (
 	"golang-api/modules/cart/usecases"
 	userRepo "golang-api/modules/users/repositories"
 	"golang-api/utils/app"
+	"golang-api/utils/config"
 	"golang-api/utils/jwt"
 	"golang-api/utils/logger"
 	"golang-api/utils/middlewares"
@@ -23,6 +24,7 @@ type HTTPHandler struct {
 	Logger   *logger.Logger
 	UseCase  usecases.Usecases
 	UserRepo userRepo.Repository
+	Config   *config.Configurations
 }
 
 // New initiation
@@ -34,12 +36,13 @@ func New(apps *app.App) *HTTPHandler {
 		Logger:   apps.Logger,
 		UserRepo: userRepo,
 		UseCase:  usecaseImpl,
+		Config:   apps.GlobalConfig,
 	}
 }
 
 func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
-	echoGroup.POST("", h.CreateCart, middlewares.VerifyBearer(h.Logger, h.UserRepo))
-	echoGroup.GET("", h.GetAllCart, middlewares.VerifyBearer(h.Logger, h.UserRepo))
+	echoGroup.POST("", h.CreateCart, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepo))
+	echoGroup.GET("", h.GetAllCart, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepo))
 }
 
 func (h *HTTPHandler) CreateCart(c echo.Context) error {
