@@ -1,7 +1,7 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -10,7 +10,7 @@ import (
 func GetConfig() *Configurations {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	return &Configurations{
 		DB_USERNAME:          os.Getenv("DB_USERNAME"),

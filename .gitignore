@@ -1,4 +1,5 @@
 .env
+.env.sample
 
 go.sum
 
