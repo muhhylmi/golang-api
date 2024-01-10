@@ -10,7 +10,7 @@ import (
 func GetConfig() *Configurations {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println(err, "environtment get from os env")
+		fmt.Println(err, ", environtment will get from os env")
 	}
 	return &Configurations{
 		DB_USERNAME:          os.Getenv("DB_USERNAME"),

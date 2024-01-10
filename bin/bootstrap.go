@@ -33,7 +33,7 @@ func Init() *app.App {
 		panic(err)
 	}
 
-	gsheetService, err := googlesheet.NewGsheetService(logger)
+	gsheetService, err := googlesheet.NewGsheetService(logger, config)
 	if err != nil {
 		panic(err)
 	}
