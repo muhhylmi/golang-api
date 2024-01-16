@@ -31,6 +31,20 @@ func (_m *Usecases) CreateBook(ctx context.Context, payload *web.RequestCreateBo
 	return r0
 }
 
+// CreateBookByGrpc provides a mock function with given fields: ctx, payload
+func (_m *Usecases) CreateBookByGrpc(ctx context.Context, payload *web.RequestCreateBook) wrapper.Result {
+	ret := _m.Called(ctx, payload)
+
+	var r0 wrapper.Result
+	if rf, ok := ret.Get(0).(func(context.Context, *web.RequestCreateBook) wrapper.Result); ok {
+		r0 = rf(ctx, payload)
+	} else {
+		r0 = ret.Get(0).(wrapper.Result)
+	}
+
+	return r0
+}
+
 // DeleteBook provides a mock function with given fields: ctx, payload
 func (_m *Usecases) DeleteBook(ctx context.Context, payload *web.RequestDeleteBook) wrapper.Result {
 	ret := _m.Called(ctx, payload)
