@@ -1,15 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"golang-api/utils/app"
 	"golang-api/utils/config"
 	"golang-api/utils/database"
 	googlesheet "golang-api/utils/google_sheet"
+	utils_grpc "golang-api/utils/grpc"
 	"golang-api/utils/logger"
 	utils "golang-api/utils/validator"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
+
+func panicRecoveryHandler(err any) error {
+	message := fmt.Sprintf("Unexpected error: %v", err)
+	fmt.Println(message)
+	return status.Errorf(codes.Internal, "%s", err)
+}
 
 func Init() *app.App {
 	config := config.GetConfig()
@@ -37,6 +49,21 @@ func Init() *app.App {
 	if err != nil {
 		panic(err)
 	}
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			recovery.UnaryServerInterceptor(recovery.WithRecoveryHandler(panicRecoveryHandler)),
+		),
+		grpc.ChainStreamInterceptor(
+			recovery.StreamServerInterceptor(recovery.WithRecoveryHandler(panicRecoveryHandler)),
+		),
+	)
+	grpcServices, err := utils_grpc.NewGrpcServices(&utils_grpc.GrpcServiceHosts{
+		BookHost: &config.BOOK_GRPC_HOST,
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	return &app.App{
 		DBService:     db,
 		Apps:          e,
@@ -44,6 +71,9 @@ func Init() *app.App {
 		Logger:        logger,
 		GlobalConfig:  config,
 		GsheetService: gsheetService,
+		GrpcServices:  grpcServices,
+
+		GRPC: grpcServer,
 	}
 
 }

@@ -58,7 +58,7 @@ func TestCreate(t *testing.T) {
 			repo.On("FindAll").Maybe().Return(testCase.findAll, testCase.findAllErr)
 
 			// call use case
-			uc := NewUsecaseImpl(cfg, l, repo, gsheet)
+			uc := NewUsecaseImpl(cfg, l, repo, gsheet, nil)
 			res := uc.GetBook(ctx)
 
 			assert.EqualValues(t, testCase.expectStatuCode, res.StatusCode)
@@ -121,7 +121,7 @@ func TestCreateBook(t *testing.T) {
 			repo.On("Save", mock.Anything).Maybe().Return(testCase.save, testCase.saveErr)
 
 			// call use case
-			uc := NewUsecaseImpl(cfg, l, repo, gsheet)
+			uc := NewUsecaseImpl(cfg, l, repo, gsheet, nil)
 			res := uc.CreateBook(ctx, testCase.createRequest)
 
 			assert.EqualValues(t, testCase.expectStatuCode, res.StatusCode)

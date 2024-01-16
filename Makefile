@@ -22,7 +22,7 @@ migrationchange:
 
 
 run:
-	go run bin\main.go
+	go run ./...
 
 dev:
 	air server

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"golang-api/modules/books/models/domain"
 	"golang-api/modules/books/models/web"
+	"golang-api/proto"
 	"golang-api/utils/constant"
 	"golang-api/utils/wrapper"
 	"regexp"
@@ -146,19 +147,22 @@ func filterRowsByColumnValue(rows [][]interface{}, req *web.GetBookSheetRequest)
 
 func (usecase *UsecaseImpl) CreateBookByGrpc(ctx context.Context, payload *web.RequestCreateBook) wrapper.Result {
 	log := usecase.Logger.LogWithContext(contextName, "CreateBookByGrpc")
-	bookData := domain.Book{
-		Id:        uuid.New().String(),
-		Title:     payload.Title,
-		Author:    payload.Author,
-		Year:      payload.Year,
-		Price:     payload.Price,
-		CreatedBy: payload.Token.UserId,
-		CreatedAt: time.Now().Unix(),
+	req := &proto.BookDataRequest{
+		Name:   payload.Title,
+		Author: payload.Author,
+		Year:   payload.Year,
+		Price:  float32(payload.Price),
 	}
-	book, err := usecase.Repository.Save(&bookData)
+	service, err := usecase.GrpcServices.GetBookService()
 	if err != nil {
-		log.Error(err.Error())
-		return wrapper.ResultFailed(wrapper.NewBadRequest("Cannot Create Book"), constant.CreateBookFailed)
+		log.Error("Cannot get Book Grpc Service", err.Error())
+		return wrapper.ResultFailed(wrapper.NewConflict("Cannot get book grpc services"), constant.FailedGetBookGrpcService)
 	}
-	return wrapper.ResultSuccess(book)
+
+	log.Info("Inserting book using Grpc", req)
+	if _, err := service.GrpcCreateBook(ctx, req); err != nil {
+		log.Error("Cannot Create Book From Grpc", err.Error())
+		return wrapper.ResultFailed(wrapper.NewConflict("Cannot create book from grpc"), constant.CreateBookFailed)
+	}
+	return wrapper.ResultSuccess(req)
 }

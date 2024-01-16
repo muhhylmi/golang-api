@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+	"fmt"
 	models "golang-api/modules/books/models/web"
 	"golang-api/modules/books/repositories"
 	userRepo "golang-api/modules/users/repositories"
@@ -40,13 +42,14 @@ type HTTPHandler struct {
 func New(apps *app.App) *HTTPHandler {
 	userRepo := userRepo.NewRepositoryImpl(apps.Logger, apps.DBService)
 	repository := repositories.NewRepositoryImpl(apps.Logger, apps.DBService)
-	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository, apps.GsheetService)
+	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository, apps.GsheetService, apps.GrpcServices)
 	return &HTTPHandler{
 		Logger:         apps.Logger,
 		UserRepository: userRepo,
 		Usecase:        usecaseImpl,
 		Validator:      apps.Validator,
 		Config:         apps.GlobalConfig,
+		GrpcServer:     apps.GRPC,
 	}
 }
 
@@ -57,8 +60,9 @@ func (h *HTTPHandler) Mount(echoGroup *echo.Group) {
 	echoGroup.DELETE("/:id", h.DeleteBook, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
 	echoGroup.GET("/:id", h.GetDetailBook, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
 	echoGroup.GET("/sheet", h.GetBookSheetData, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
-	// echoGroup.POST("/rpc", h.CreateBookByGrpc, middlewares.VerifyBearer(h.Logger, h.UserRepository))
-	// h.grpcServer.RegisterService(&proto.BookService_ServiceDesc, h)
+	echoGroup.POST("/rpc", h.CreateBookByGrpc, middlewares.VerifyBearer(h.Logger, h.Config, h.UserRepository))
+
+	h.GrpcServer.RegisterService(&proto.BookService_ServiceDesc, h)
 }
 
 func (h *HTTPHandler) GetAllBook(c echo.Context) error {
@@ -147,4 +151,55 @@ func (h *HTTPHandler) GetBookSheetData(c echo.Context) error {
 		return wrapper.ResponseError(result.Error, result.StatusCode, c)
 	}
 	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusOK, c)
+}
+
+func (h *HTTPHandler) CreateBookByGrpc(c echo.Context) error {
+	log := h.Logger.LogWithContext(contextName, "CreateBookByGrpc")
+	book := new(models.RequestCreateBook)
+	book.Token = c.Get("user").(jwt.ClaimToken)
+	if err := utils.BindValidate(c, book); err != nil {
+		log.Error(err)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), constant.ValidationError)
+		return wrapper.ResponseError(perr.Error, perr.StatusCode, c)
+	}
+
+	result := h.Usecase.CreateBookByGrpc(c.Request().Context(), book)
+	if result.Error != nil {
+		return wrapper.ResponseError(result.Error, result.StatusCode, c)
+	}
+
+	return wrapper.Response(result.Data, "Your Request has been Approve", http.StatusCreated, c)
+}
+
+func (h *HTTPHandler) GrpcCreateBook(c context.Context, req *proto.BookDataRequest) (*proto.BookDataResponse, error) {
+	log := h.Logger.LogWithContext(contextName, "GrpcCreateBook")
+
+	model := &models.RequestCreateBook{
+		Title:  req.Name,
+		Author: req.Author,
+		Year:   req.Year,
+		Price:  float64(req.Price),
+	}
+	model.Token = jwt.ClaimToken{
+		UserId: "grpc",
+	}
+
+	if err := h.Validator.Validate(model); err != nil {
+		log.Error(err)
+		perr := wrapper.ResultFailed(wrapper.NewBadRequest(err.Error()), constant.ValidationError)
+		return &proto.BookDataResponse{
+			Success: false,
+		}, fmt.Errorf("error validation with code " + perr.StatusCode)
+	}
+
+	result := h.Usecase.CreateBook(c, model)
+	if result.Error != nil {
+		return &proto.BookDataResponse{
+			Success: false,
+		}, fmt.Errorf("error creating book")
+	}
+
+	return &proto.BookDataResponse{
+		Success: true,
+	}, nil
 }
