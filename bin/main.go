@@ -45,8 +45,8 @@ func main() {
 
 	// run gRPC server
 	g.Go(func() error {
-		l.Info("Starting gRPC server", 9501)
-		port, err := net.Listen("tcp", fmt.Sprintf(":%d", 9501))
+		l.Info("Starting gRPC server", apps.GlobalConfig.GRPC_PORT)
+		port, err := net.Listen("tcp", fmt.Sprintf(":%s", apps.GlobalConfig.GRPC_PORT))
 		if err != nil {
 			return err
 		}

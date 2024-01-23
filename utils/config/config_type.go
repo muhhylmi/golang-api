@@ -17,6 +17,7 @@ type Configurations struct {
 	BASIC_AUTH_PASSWORD  string
 	JWT_SECRET_KEY       string
 	BOOK_GRPC_HOST       string
+	GRPC_PORT            string
 
 	SPREAD_SHEET_ID           string
 	SHEET_KEY_TYPE            string

@@ -29,6 +29,7 @@ func GetConfig() *Configurations {
 		BASIC_AUTH_PASSWORD:  os.Getenv("BASIC_AUTH_PASSWORD"),
 		JWT_SECRET_KEY:       os.Getenv("JWT_SECRET_KEY"),
 		BOOK_GRPC_HOST:       os.Getenv("BOOK_GRPC_HOST"),
+		GRPC_PORT:            os.Getenv("BOOK_GRPC"),
 
 		SPREAD_SHEET_ID:           os.Getenv("SPREAD_SHEET_ID"),
 		SHEET_KEY_TYPE:            os.Getenv("SHEET_KEY_TYPE"),
