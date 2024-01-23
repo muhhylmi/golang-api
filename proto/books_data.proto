@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package golang_api;
+
+option go_package = "./proto";
+
+message BookData {
+    string id = 1;
+    string name = 2;
+    string author = 3;
+    string year = 4;
+    float price = 5;
+}
+
+message BookDataRequest {
+    string name = 1;
+    string author = 2;
+    string year = 3;
+    float price = 4;
+}
+
+message BookDataResponse {
+    bool success = 1;
+    BookData data = 2;
+}
