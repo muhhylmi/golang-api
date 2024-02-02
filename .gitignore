@@ -1,6 +1,6 @@
 .env
 .sample.env
 
-app*
+app
 
 tmp
