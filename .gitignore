@@ -1,8 +1,6 @@
 .env
 .sample.env
 
-go.sum
-
 app*
 
 tmp
