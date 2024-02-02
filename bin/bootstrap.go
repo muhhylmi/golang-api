@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"golang-api/utils/app"
+	app_type "golang-api/utils/app_opts"
 	"golang-api/utils/config"
 	"golang-api/utils/database"
 	googlesheet "golang-api/utils/google_sheet"
@@ -23,7 +23,7 @@ func panicRecoveryHandler(err any) error {
 	return status.Errorf(codes.Internal, "%s", err)
 }
 
-func Init() *app.App {
+func Init() *app_type.App {
 	config := config.GetConfig()
 	logger := logger.Newlogger()
 	e := echo.New()
@@ -64,7 +64,7 @@ func Init() *app.App {
 		panic(err)
 	}
 
-	return &app.App{
+	return &app_type.App{
 		DBService:     db,
 		Apps:          e,
 		Validator:     validator,

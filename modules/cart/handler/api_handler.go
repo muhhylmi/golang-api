@@ -5,7 +5,7 @@ import (
 	"golang-api/modules/cart/repositories"
 	"golang-api/modules/cart/usecases"
 	userRepo "golang-api/modules/users/repositories"
-	"golang-api/utils/app"
+	app_type "golang-api/utils/app_opts"
 	"golang-api/utils/config"
 	"golang-api/utils/jwt"
 	"golang-api/utils/logger"
@@ -28,7 +28,7 @@ type HTTPHandler struct {
 }
 
 // New initiation
-func New(apps *app.App) *HTTPHandler {
+func New(apps *app_type.App) *HTTPHandler {
 	userRepo := userRepo.NewRepositoryImpl(apps.Logger, apps.DBService)
 	repository := repositories.NewRepositoryImpl(apps.Logger, apps.DBService)
 	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository)

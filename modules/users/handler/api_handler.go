@@ -4,7 +4,7 @@ import (
 	models "golang-api/modules/users/models/web"
 	"golang-api/modules/users/repositories"
 	"golang-api/modules/users/usecases"
-	"golang-api/utils/app"
+	app_type "golang-api/utils/app_opts"
 	"golang-api/utils/config"
 	"golang-api/utils/logger"
 	"golang-api/utils/middlewares"
@@ -25,7 +25,7 @@ type HTTPHandler struct {
 }
 
 // New initiation
-func New(apps *app.App) *HTTPHandler {
+func New(apps *app_type.App) *HTTPHandler {
 	repository := repositories.NewRepositoryImpl(apps.Logger, apps.DBService)
 	usecaseImpl := usecases.NewUsecaseImpl(apps.GlobalConfig, apps.Logger, repository)
 	return &HTTPHandler{
