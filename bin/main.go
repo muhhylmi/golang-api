@@ -25,9 +25,9 @@ func main() {
 		return c.String(http.StatusOK, "This service is running properly")
 	})
 
-	booksGroup := apps.Apps.Group("/books")
-	userGroup := apps.Apps.Group("/users")
-	cartGroup := apps.Apps.Group("/cart")
+	booksGroup := apps.Apps.Group("/v1/books")
+	userGroup := apps.Apps.Group("/v1/users")
+	cartGroup := apps.Apps.Group("/v1/cart")
 	books.New(apps).Mount(booksGroup)
 	users.New(apps).Mount(userGroup)
 	carts.New(apps).Mount(cartGroup)
