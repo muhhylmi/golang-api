@@ -21,7 +21,7 @@ func main() {
 	apps := Init()
 	apps.Apps.Validator = apps.Validator
 	apps.Apps.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "This service is running properly test")
+		return c.String(http.StatusOK, "This service is running properly tests")
 	})
 
 	booksGroup := apps.Apps.Group("/v1/books")
