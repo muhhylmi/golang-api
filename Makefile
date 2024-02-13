@@ -20,7 +20,6 @@ migrationversion:
 migrationchange:
 	migrate -database "${DB_URI}?sslmode=${SSL_MODE}&search_path=${SCHEMA_NAME}" -path ${DB_SCHEMA} force ${VERSION}
 
-
 run:
 	go run ./...
 

@@ -40,7 +40,7 @@ WORKDIR /app
 COPY --from=builder /app/app .
 
 # Expose port yang digunakan oleh aplikasi
-EXPOSE 8080
+EXPOSE 3000
 
 # Command untuk menjalankan aplikasi
 CMD ["./app"]
