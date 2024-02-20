@@ -30,6 +30,6 @@ func InitPostgres(params *DBServiceVar) (*gorm.DB, error) {
 		log.Info("Connection Postgres is Failed")
 		return nil, err
 	}
-	log.Info("Success connect to database")
+	log.Info("Success connect to postgres database")
 	return PostgresDB, nil
 }
